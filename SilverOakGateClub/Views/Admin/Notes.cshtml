@@ -1,0 +1,61 @@
+@model List<SilverOakGateClub.Models.Notes>
+@{
+    ViewData["Title"] = "Manage Notes";
+}
+
+<div class="page-header d-flex justify-content-between align-items-start">
+    <div>
+        <h1>Manage Notes</h1>
+        <p>Upload and manage study materials</p>
+    </div>
+    <a href="@Url.Action("CreateNotes", "Admin")" class="btn-primary-gradient">
+        <i class="bi bi-upload"></i> Upload Notes
+    </a>
+</div>
+
+<div class="card">
+    <div class="card-body p-0">
+        @if (Model.Count > 0)
+        {
+            <table class="table-modern">
+                <thead>
+                <tr>
+                    <th>Title</th>
+                    <th>Branch</th>
+                    <th>Subject</th>
+                    <th>Type</th>
+                    <th>Rating</th>
+                    <th>Downloads</th>
+                    <th>Uploaded By</th>
+                    <th>Actions</th>
+                </tr>
+                </thead>
+                <tbody>
+                @foreach (var n in Model)
+                {
+                    <tr>
+                        <td style="font-weight:500;">@n.Title</td>
+                        <td>@n.Branch?.Name</td>
+                        <td>@(n.Subject ?? "—")</td>
+                        <td><span class="badge-info">@n.FileType</span></td>
+                        <td>⭐ @n.AverageRating.ToString("F1") (@n.RatingCount)</td>
+                        <td>@n.DownloadCount</td>
+                        <td style="color:var(--text-muted);">@n.UploadedBy?.FullName</td>
+                        <td>
+                            <form asp-action="DeleteNotes" asp-route-id="@n.Id" method="post" style="display:inline;"
+                                  onsubmit="return confirm('Delete these notes?');">
+                                @Html.AntiForgeryToken()
+                                <button type="submit" class="btn-danger-soft"><i class="bi bi-trash3"></i></button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        }
+        else
+        {
+            <div class="empty-state"><i class="bi bi-file-text d-block"></i><h5>No notes uploaded yet</h5></div>
+        }
+    </div>
+</div>

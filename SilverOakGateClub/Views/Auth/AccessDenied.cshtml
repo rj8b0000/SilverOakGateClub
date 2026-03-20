@@ -1,0 +1,15 @@
+@{
+    ViewData["Title"] = "Access Denied";
+    Layout = "_Layout";
+}
+
+<div class="login-page">
+    <div class="login-card text-center">
+        <i class="bi bi-shield-exclamation" style="font-size:4rem;color:var(--danger);margin-bottom:20px;display:block;"></i>
+        <h2>Access Denied</h2>
+        <p class="login-sub">You do not have permission to access this page.</p>
+        <a href="@Url.Action("Login", "Auth")" class="btn-primary-gradient">
+            <i class="bi bi-arrow-left"></i> Back to Login
+        </a>
+    </div>
+</div>

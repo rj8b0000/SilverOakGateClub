@@ -1,0 +1,210 @@
+@model SilverOakGateClub.ViewModel.TestSubmissionViewModel
+@{
+    ViewData["Title"] = Model.TestTitle;
+    Layout = "_Layout";
+}
+
+<div class="row g-4">
+    <!-- Main Test Area -->
+    <div class="col-xl-9">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h4 style="font-weight:700;margin:0;">@Model.TestTitle</h4>
+                <p style="color:var(--text-muted);margin:0;font-size:0.9rem;">@Model.BranchName • @Model.TotalQuestions Questions • @Model.TotalMarks Marks</p>
+            </div>
+            <div class="exam-timer" id="examTimer">@Model.DurationMinutes:00</div>
+        </div>
+
+        <div id="questionsContainer">
+            @for (int i = 0; i < Model.Questions.Count; i++)
+            {
+                var q = Model.Questions[i];
+                <div class="question-card" id="question-@q.QuestionId" style="@(i > 0 ? "display:none;" : "")">
+                    <div class="d-flex align-items-start mb-3">
+                        <span class="question-number">@q.QuestionNumber</span>
+                        <div>
+                            <div style="font-size:1rem;font-weight:500;">@q.QuestionText</div>
+                            <div style="font-size:0.8rem;color:var(--text-muted);margin-top:4px;">
+                                <span class="badge-primary">@q.Marks marks</span>
+                                @if (q.NegativeMarks > 0)
+                                {
+                                    <span class="badge-danger ms-1">-@q.NegativeMarks negative</span>
+                                }
+                            </div>
+                        </div>
+                    </div>
+
+                    @foreach (var opt in new[] { ("A", q.OptionA), ("B", q.OptionB), ("C", q.OptionC), ("D", q.OptionD) })
+                    {
+                        <label class="option-label" id="opt-@q.QuestionId-@opt.Item1" onclick="selectOption(@q.QuestionId, '@opt.Item1')">
+                            <span class="option-circle">@opt.Item1</span>
+                            <span class="option-text">@opt.Item2</span>
+                        </label>
+                    }
+                </div>
+            }
+        </div>
+
+        <!-- Navigation Buttons -->
+        <div class="d-flex justify-content-between mt-3">
+            <button class="btn-outline-custom" id="prevBtn" onclick="navigateQuestion(-1)" disabled>
+                <i class="bi bi-chevron-left"></i> Previous
+            </button>
+            <button class="btn-outline-custom" id="clearBtn" onclick="clearAnswer()">
+                <i class="bi bi-eraser"></i> Clear
+            </button>
+            <button class="btn-primary-gradient" id="nextBtn" onclick="navigateQuestion(1)">
+                Next <i class="bi bi-chevron-right"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- Side Panel -->
+    <div class="col-xl-3">
+        <div class="card mb-4" style="position:sticky;top:90px;">
+            <div class="card-header">
+                <h5>Question Navigator</h5>
+            </div>
+            <div class="card-body">
+                <div class="question-nav" id="questionNav">
+                    @for (int i = 0; i < Model.Questions.Count; i++)
+                    {
+                        <button class="q-nav-btn @(i == 0 ? "active" : "")" 
+                                id="nav-@Model.Questions[i].QuestionId"
+                                onclick="goToQuestion(@i)">
+                            @(i + 1)
+                        </button>
+                    }
+                </div>
+
+                <div class="mt-4" style="font-size:0.8rem;">
+                    <div class="d-flex align-items-center gap-2 mb-2">
+                        <div style="width:16px;height:16px;border-radius:4px;background:var(--primary-gradient);"></div>
+                        <span style="color:var(--text-muted);">Current</span>
+                    </div>
+                    <div class="d-flex align-items-center gap-2 mb-2">
+                        <div style="width:16px;height:16px;border-radius:4px;background:rgba(16,185,129,0.15);border:1px solid rgba(16,185,129,0.3);"></div>
+                        <span style="color:var(--text-muted);">Answered</span>
+                    </div>
+                    <div class="d-flex align-items-center gap-2">
+                        <div style="width:16px;height:16px;border-radius:4px;background:var(--bg-tertiary);border:1px solid var(--border-color);"></div>
+                        <span style="color:var(--text-muted);">Not Answered</span>
+                    </div>
+                </div>
+
+                <hr style="border-color:var(--border-color);"/>
+
+                <button class="btn-primary-gradient w-100 justify-content-center" onclick="submitTest()">
+                    <i class="bi bi-check2-circle"></i> Submit Test
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        const totalQuestions = @Model.Questions.Count;
+        const testId = @Model.TestId;
+        const durationMinutes = @Model.DurationMinutes;
+        const questions = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.Questions.Select(q => q.QuestionId)));
+
+        let currentIndex = 0;
+        let answers = {};
+        let totalSeconds = durationMinutes * 60;
+        let timerInterval;
+
+        // ── Timer ──
+        function startTimer() {
+            timerInterval = setInterval(() => {
+                totalSeconds--;
+                const mins = Math.floor(totalSeconds / 60);
+                const secs = totalSeconds % 60;
+                const timerEl = document.getElementById('examTimer');
+                timerEl.textContent = `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+
+                if (totalSeconds <= 300) timerEl.className = 'exam-timer warning';
+                if (totalSeconds <= 60) timerEl.className = 'exam-timer danger';
+
+                if (totalSeconds <= 0) {
+                    clearInterval(timerInterval);
+                    submitTest(true);
+                }
+            }, 1000);
+        }
+        startTimer();
+
+        // ── Navigation ──
+        function showQuestion(idx) {
+            document.querySelectorAll('.question-card').forEach(el => el.style.display = 'none');
+            document.getElementById('question-' + questions[idx]).style.display = 'block';
+
+            document.querySelectorAll('.q-nav-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById('nav-' + questions[idx]).classList.add('active');
+
+            document.getElementById('prevBtn').disabled = idx === 0;
+            document.getElementById('nextBtn').textContent = idx === totalQuestions - 1 ? 'Finish' : 'Next ';
+            if (idx < totalQuestions - 1) {
+                document.getElementById('nextBtn').innerHTML = 'Next <i class="bi bi-chevron-right"></i>';
+            }
+            currentIndex = idx;
+        }
+
+        function navigateQuestion(dir) {
+            const newIdx = currentIndex + dir;
+            if (newIdx >= 0 && newIdx < totalQuestions) showQuestion(newIdx);
+        }
+
+        function goToQuestion(idx) { showQuestion(idx); }
+
+        // ── Answer Selection ──
+        function selectOption(qId, option) {
+            ['A', 'B', 'C', 'D'].forEach(o => {
+                document.getElementById('opt-' + qId + '-' + o)?.classList.remove('selected');
+            });
+            document.getElementById('opt-' + qId + '-' + option)?.classList.add('selected');
+            answers[qId] = option;
+
+            document.getElementById('nav-' + qId)?.classList.add('answered');
+        }
+
+        function clearAnswer() {
+            const qId = questions[currentIndex];
+            ['A', 'B', 'C', 'D'].forEach(o => {
+                document.getElementById('opt-' + qId + '-' + o)?.classList.remove('selected');
+            });
+            delete answers[qId];
+            document.getElementById('nav-' + qId)?.classList.remove('answered');
+        }
+
+        // ── Submit ──
+        async function submitTest(autoSubmit = false) {
+            if (!autoSubmit && !confirm('Are you sure you want to submit? You won\'t be able to change answers.')) return;
+
+            clearInterval(timerInterval);
+            const timeTaken = (durationMinutes * 60) - totalSeconds;
+
+            const response = await fetch('/Test/Submit', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]')?.value || ''
+                },
+                body: JSON.stringify({
+                    testId: testId,
+                    timeTakenSeconds: timeTaken,
+                    answers: answers
+                })
+            });
+
+            const data = await response.json();
+            window.location.href = '/Test/Result/' + data.resultId;
+        }
+
+        // Prevent accidental leave
+        window.addEventListener('beforeunload', (e) => {
+            e.preventDefault();
+            e.returnValue = '';
+        });
+    </script>
+}

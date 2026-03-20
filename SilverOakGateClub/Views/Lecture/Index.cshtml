@@ -1,0 +1,77 @@
+@model SilverOakGateClub.ViewModel.LectureListViewModel
+@{
+    ViewData["Title"] = "Lectures";
+}
+
+<div class="page-header">
+    <h1>Video Lectures</h1>
+    <p>@Model.BranchName — Learn from curated video content</p>
+</div>
+
+<!-- Subject Filter -->
+@if (Model.Subjects.Count > 0)
+{
+    <div class="d-flex gap-2 flex-wrap mb-4">
+        <a href="@Url.Action("Index", "Lecture")" class="btn-outline-custom btn-sm @(Model.SelectedSubject == null ? "active" : "")"
+           style="@(Model.SelectedSubject == null ? "background:var(--primary-gradient);color:white;border-color:transparent;" : "")">
+            All
+        </a>
+        @foreach (var subject in Model.Subjects)
+        {
+            var isActive = Model.SelectedSubject == subject;
+            <a href="@Url.Action("Index", "Lecture", new { subject = subject })"
+               class="btn-outline-custom btn-sm"
+               style="@(isActive ? "background:var(--primary-gradient);color:white;border-color:transparent;" : "")">
+                @subject
+            </a>
+        }
+    </div>
+}
+
+@if (Model.Lectures.Count > 0)
+{
+    <div class="row g-4">
+        @foreach (var lecture in Model.Lectures)
+        {
+            <div class="col-md-6 col-xl-4 animate-in">
+                <a href="@Url.Action("Watch", "Lecture", new { id = lecture.Id })" style="text-decoration:none;">
+                    <div class="test-card">
+                        <div class="position-relative mb-3" style="border-radius:var(--radius-sm);overflow:hidden;background:var(--bg-tertiary);aspect-ratio:16/9;display:flex;align-items:center;justify-content:center;">
+                            @if (!string.IsNullOrEmpty(lecture.ThumbnailUrl))
+                            {
+                                <img src="@lecture.ThumbnailUrl" alt="@lecture.Title" style="width:100%;height:100%;object-fit:cover;"/>
+                            }
+                            else
+                            {
+                                <i class="bi bi-play-circle" style="font-size:3rem;color:var(--primary);"></i>
+                            }
+                            <div style="position:absolute;bottom:8px;right:8px;background:rgba(0,0,0,0.8);padding:4px 10px;border-radius:6px;font-size:0.75rem;font-weight:600;">
+                                @lecture.DurationMinutes min
+                            </div>
+                        </div>
+
+                        <h5 style="font-weight:600;font-size:0.95rem;">@lecture.Title</h5>
+
+                        @if (!string.IsNullOrEmpty(lecture.Subject))
+                        {
+                            <span class="badge-primary" style="margin-bottom:8px;display:inline-block;">@lecture.Subject</span>
+                        }
+
+                        <div class="test-meta" style="margin:8px 0 0;">
+                            <span><i class="bi bi-eye"></i> @lecture.ViewCount views</span>
+                            <span><i class="bi bi-calendar"></i> @lecture.CreatedAt.ToString("dd MMM yyyy")</span>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        }
+    </div>
+}
+else
+{
+    <div class="empty-state">
+        <i class="bi bi-play-circle d-block"></i>
+        <h5>No lectures available</h5>
+        <p>Check back later for new video content</p>
+    </div>
+}

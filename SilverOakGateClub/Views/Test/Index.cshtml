@@ -1,0 +1,62 @@
+@model SilverOakGateClub.ViewModel.TestListViewModel
+@{
+    ViewData["Title"] = Model.IsPYQ ? "PYQ Papers" : "Mock Tests";
+}
+
+<div class="page-header">
+    <h1>@(Model.IsPYQ ? "Previous Year Question Papers" : "Mock Tests")</h1>
+    <p>@Model.BranchName — @(Model.IsPYQ ? "Practice with past GATE papers" : "Test your preparation with timed mock tests")</p>
+</div>
+
+@if (Model.Tests.Count > 0)
+{
+    <div class="row g-4">
+        @foreach (var test in Model.Tests)
+        {
+            <div class="col-md-6 col-xl-4 animate-in">
+                <div class="test-card">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <h5 style="font-weight:600;font-size:1.05rem;margin:0;">@test.Title</h5>
+                        @if (test.IsPYQ && test.Year.HasValue)
+                        {
+                            <span class="badge-info">@test.Year</span>
+                        }
+                    </div>
+
+                    @if (!string.IsNullOrEmpty(test.Description))
+                    {
+                        <p style="font-size:0.85rem;color:var(--text-muted);margin-bottom:0;">
+                            @test.Description.Substring(0, Math.Min(test.Description.Length, 100))@(test.Description.Length > 100 ? "..." : "")
+                        </p>
+                    }
+
+                    <div class="test-meta">
+                        <span><i class="bi bi-clock"></i> @test.DurationMinutes min</span>
+                        <span><i class="bi bi-list-check"></i> @test.TotalQuestions Qs</span>
+                        <span><i class="bi bi-star"></i> @test.TotalMarks marks</span>
+                    </div>
+
+                    <div class="mt-auto pt-3" style="border-top:1px solid var(--border-color);">
+                        @if (test.IsPYQ && !string.IsNullOrEmpty(test.PdfUrl))
+                        {
+                            <a href="@test.PdfUrl" target="_blank" class="btn-outline-custom btn-sm me-2">
+                                <i class="bi bi-file-pdf"></i> View PDF
+                            </a>
+                        }
+                        <a href="@Url.Action("Start", "Test", new { id = test.Id })" class="btn-primary-gradient btn-sm">
+                            <i class="bi bi-play-fill"></i> Start Test
+                        </a>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}
+else
+{
+    <div class="empty-state">
+        <i class="bi bi-journal-x d-block"></i>
+        <h5>No @(Model.IsPYQ ? "PYQ papers" : "tests") available</h5>
+        <p>Check back later for new @(Model.IsPYQ ? "previous year papers" : "mock tests")</p>
+    </div>
+}

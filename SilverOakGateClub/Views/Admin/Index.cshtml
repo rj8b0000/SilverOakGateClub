@@ -1,0 +1,128 @@
+@model SilverOakGateClub.ViewModel.AdminDashboardViewModel
+@{
+    ViewData["Title"] = "Admin Dashboard";
+}
+
+<div class="page-header">
+    <h1>Admin Dashboard</h1>
+    <p>System overview and management</p>
+</div>
+
+<!-- Stats -->
+<div class="row g-4 mb-4">
+    <div class="col-md-6 col-xl-2 animate-in">
+        <div class="stat-card">
+            <div class="stat-icon purple"><i class="bi bi-people-fill"></i></div>
+            <div class="stat-value">@Model.TotalStudents</div>
+            <div class="stat-label">Students</div>
+        </div>
+    </div>
+    <div class="col-md-6 col-xl-2 animate-in">
+        <div class="stat-card">
+            <div class="stat-icon blue"><i class="bi bi-journal-check"></i></div>
+            <div class="stat-value">@Model.TotalTests</div>
+            <div class="stat-label">Tests</div>
+        </div>
+    </div>
+    <div class="col-md-6 col-xl-2 animate-in">
+        <div class="stat-card">
+            <div class="stat-icon green"><i class="bi bi-question-circle"></i></div>
+            <div class="stat-value">@Model.TotalQuestions</div>
+            <div class="stat-label">Questions</div>
+        </div>
+    </div>
+    <div class="col-md-6 col-xl-2 animate-in">
+        <div class="stat-card">
+            <div class="stat-icon orange"><i class="bi bi-play-circle"></i></div>
+            <div class="stat-value">@Model.TotalLectures</div>
+            <div class="stat-label">Lectures</div>
+        </div>
+    </div>
+    <div class="col-md-6 col-xl-2 animate-in">
+        <div class="stat-card">
+            <div class="stat-icon red"><i class="bi bi-file-text"></i></div>
+            <div class="stat-value">@Model.TotalNotes</div>
+            <div class="stat-label">Notes</div>
+        </div>
+    </div>
+    <div class="col-md-6 col-xl-2 animate-in">
+        <div class="stat-card">
+            <div class="stat-icon cyan"><i class="bi bi-megaphone"></i></div>
+            <div class="stat-value">@Model.ActiveAnnouncements</div>
+            <div class="stat-label">Notices</div>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Actions -->
+<div class="row g-4 mb-4">
+    <div class="col-md-6 col-xl-3 animate-in">
+        <a href="@Url.Action("CreateUser", "Admin")" style="text-decoration:none;">
+            <div class="stat-card" style="cursor:pointer;">
+                <div class="stat-icon purple"><i class="bi bi-person-plus-fill"></i></div>
+                <h6 style="margin-bottom:4px;font-weight:600;">Add User</h6>
+                <p style="font-size:0.8rem;color:var(--text-muted);margin:0;">Create a new student or admin account</p>
+            </div>
+        </a>
+    </div>
+    <div class="col-md-6 col-xl-3 animate-in">
+        <a href="@Url.Action("CreateTest", "Admin")" style="text-decoration:none;">
+            <div class="stat-card" style="cursor:pointer;">
+                <div class="stat-icon blue"><i class="bi bi-plus-circle-fill"></i></div>
+                <h6 style="margin-bottom:4px;font-weight:600;">Create Test</h6>
+                <p style="font-size:0.8rem;color:var(--text-muted);margin:0;">Add new mock test or PYQ</p>
+            </div>
+        </a>
+    </div>
+    <div class="col-md-6 col-xl-3 animate-in">
+        <a href="@Url.Action("CreateLecture", "Admin")" style="text-decoration:none;">
+            <div class="stat-card" style="cursor:pointer;">
+                <div class="stat-icon green"><i class="bi bi-camera-video-fill"></i></div>
+                <h6 style="margin-bottom:4px;font-weight:600;">Add Lecture</h6>
+                <p style="font-size:0.8rem;color:var(--text-muted);margin:0;">Upload a new video lecture</p>
+            </div>
+        </a>
+    </div>
+    <div class="col-md-6 col-xl-3 animate-in">
+        <a href="@Url.Action("CreateAnnouncement", "Admin")" style="text-decoration:none;">
+            <div class="stat-card" style="cursor:pointer;">
+                <div class="stat-icon orange"><i class="bi bi-megaphone-fill"></i></div>
+                <h6 style="margin-bottom:4px;font-weight:600;">Announce</h6>
+                <p style="font-size:0.8rem;color:var(--text-muted);margin:0;">Post a new announcement</p>
+            </div>
+        </a>
+    </div>
+</div>
+
+<!-- Recent Users -->
+<div class="card animate-in">
+    <div class="card-header">
+        <h5><i class="bi bi-people me-2" style="color:var(--primary);"></i>Recent Users</h5>
+        <a href="@Url.Action("Users", "Admin")" class="btn-outline-custom btn-sm">View All</a>
+    </div>
+    <div class="card-body p-0">
+        <table class="table-modern">
+            <thead>
+            <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Role</th>
+                <th>Branch</th>
+                <th>Joined</th>
+            </tr>
+            </thead>
+            <tbody>
+            @foreach (var u in Model.RecentUsers)
+            {
+                <tr>
+                    <td style="font-weight:500;">@u.FullName</td>
+                    <td style="color:var(--text-muted);">@u.Email</td>
+                    <td><span class="@(u.Role == "Admin" ? "badge-danger" : "badge-primary")">@u.Role</span></td>
+                    <td>@(u.Branch?.Name ?? "—")</td>
+                    <td style="font-size:0.85rem;color:var(--text-muted);">@u.CreatedAt.ToString("dd MMM yyyy")</td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    </div>
+</div>

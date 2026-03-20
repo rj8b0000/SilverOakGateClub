@@ -1,0 +1,49 @@
+@model SilverOakGateClub.ViewModel.LoginViewModel
+@{
+    ViewData["Title"] = "Login";
+    Layout = "_Layout";
+}
+
+<div class="login-page">
+    <div class="login-card">
+        <div class="login-logo">
+            <div class="logo-icon"><i class="bi bi-mortarboard-fill"></i></div>
+            <h2>Welcome Back</h2>
+            <p class="login-sub">Sign in to Silver Oak GATE Club</p>
+        </div>
+
+        <form asp-action="Login" method="post">
+            @Html.AntiForgeryToken()
+            <input type="hidden" asp-for="ReturnUrl"/>
+
+            <div asp-validation-summary="All" class="text-danger mb-3" style="font-size:0.85rem;"></div>
+
+            <div class="mb-3">
+                <label asp-for="Email" class="form-label"><i class="bi bi-envelope me-1"></i> Email Address</label>
+                <input asp-for="Email" class="form-control" placeholder="Enter your email" autocomplete="email"/>
+                <span asp-validation-for="Email" class="text-danger" style="font-size:0.8rem;"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Password" class="form-label"><i class="bi bi-lock me-1"></i> Password</label>
+                <input asp-for="Password" class="form-control" placeholder="Enter your password" autocomplete="current-password"/>
+                <span asp-validation-for="Password" class="text-danger" style="font-size:0.8rem;"></span>
+            </div>
+
+            <div class="mb-4 d-flex align-items-center justify-content-between">
+                <div class="form-check">
+                    <input asp-for="RememberMe" class="form-check-input" style="background-color:var(--bg-tertiary);border-color:var(--border-color);"/>
+                    <label asp-for="RememberMe" class="form-check-label" style="font-size:0.85rem;color:var(--text-secondary);">Remember me</label>
+                </div>
+            </div>
+
+            <button type="submit" class="btn-primary-gradient w-100 justify-content-center" style="padding:14px;">
+                <i class="bi bi-box-arrow-in-right"></i> Sign In
+            </button>
+        </form>
+
+        <div class="mt-4 text-center" style="font-size:0.8rem;color:var(--text-muted);">
+            <i class="bi bi-shield-lock me-1"></i> Admin credentials: admin&#64;gateclub.com / Admin&#64;123
+        </div>
+    </div>
+</div>

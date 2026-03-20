@@ -1,0 +1,141 @@
+@model SilverOakGateClub.ViewModel.ResultHistoryViewModel
+@{
+    ViewData["Title"] = "My Results";
+}
+
+<div class="page-header">
+    <h1>Results History</h1>
+    <p>@Model.BranchName — Track your GATE preparation progress</p>
+</div>
+
+<!-- Stats -->
+<div class="row g-4 mb-4">
+    <div class="col-md-4 animate-in">
+        <div class="stat-card">
+            <div class="stat-icon purple"><i class="bi bi-journal-check"></i></div>
+            <div class="stat-value">@Model.TotalTestsTaken</div>
+            <div class="stat-label">Tests Taken</div>
+        </div>
+    </div>
+    <div class="col-md-4 animate-in">
+        <div class="stat-card">
+            <div class="stat-icon blue"><i class="bi bi-graph-up"></i></div>
+            <div class="stat-value">@Model.OverallAverage%</div>
+            <div class="stat-label">Overall Average</div>
+        </div>
+    </div>
+    <div class="col-md-4 animate-in">
+        <div class="stat-card">
+            <div class="stat-icon green"><i class="bi bi-trophy"></i></div>
+            <div class="stat-value">@Model.BestScore%</div>
+            <div class="stat-label">Best Score</div>
+        </div>
+    </div>
+</div>
+
+<!-- Chart -->
+@if (Model.ScoreData.Count > 0)
+{
+    <div class="card mb-4 animate-in">
+        <div class="card-header">
+            <h5><i class="bi bi-bar-chart-fill me-2" style="color:var(--primary);"></i>Score Progression</h5>
+        </div>
+        <div class="card-body">
+            <canvas id="historyChart" height="300"></canvas>
+        </div>
+    </div>
+}
+
+<!-- Results Table -->
+<div class="card animate-in">
+    <div class="card-header">
+        <h5><i class="bi bi-list-ul me-2"></i>All Results</h5>
+    </div>
+    <div class="card-body p-0">
+        @if (Model.Results.Count > 0)
+        {
+            <table class="table-modern">
+                <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Test Name</th>
+                    <th>Score</th>
+                    <th>Correct / Wrong / Skipped</th>
+                    <th>Percentage</th>
+                    <th>Time</th>
+                    <th>Date</th>
+                    <th></th>
+                </tr>
+                </thead>
+                <tbody>
+                @{ int idx = 1; }
+                @foreach (var r in Model.Results)
+                {
+                    var pctClass = r.Percentage >= 70 ? "badge-success" : r.Percentage >= 40 ? "badge-warning" : "badge-danger";
+                    <tr>
+                        <td>@idx</td>
+                        <td style="font-weight:500;">@r.MockTest.Title</td>
+                        <td>@r.Score / @r.TotalMarks</td>
+                        <td>
+                            <span style="color:var(--success);">@r.CorrectAnswers</span> /
+                            <span style="color:var(--danger);">@r.WrongAnswers</span> /
+                            <span style="color:var(--warning);">@r.Unanswered</span>
+                        </td>
+                        <td><span class="@pctClass">@r.Percentage%</span></td>
+                        <td style="color:var(--text-muted);">@(r.TimeTakenSeconds / 60)m @(r.TimeTakenSeconds % 60)s</td>
+                        <td style="color:var(--text-muted);font-size:0.85rem;">@r.CompletedAt.ToString("dd MMM yyyy")</td>
+                        <td>
+                            <a href="@Url.Action("Result", "Test", new { id = r.Id })" class="btn-outline-custom btn-sm">
+                                <i class="bi bi-eye"></i> View
+                            </a>
+                        </td>
+                    </tr>
+                    idx++;
+                }
+                </tbody>
+            </table>
+        }
+        else
+        {
+            <div class="empty-state">
+                <i class="bi bi-clipboard-data d-block"></i>
+                <h5>No results yet</h5>
+                <p>Take a mock test to get started!</p>
+                <a href="@Url.Action("Index", "Test")" class="btn-primary-gradient mt-3"><i class="bi bi-play-fill"></i> Take a Test</a>
+            </div>
+        }
+    </div>
+</div>
+
+@section Scripts {
+    @if (Model.ScoreData.Count > 0)
+    {
+        <script>
+            const ctx = document.getElementById('historyChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.Labels)),
+                    datasets: [{
+                        label: 'Score %',
+                        data: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.ScoreData)),
+                        backgroundColor: 'rgba(99, 102, 241, 0.6)',
+                        borderColor: '#6366f1',
+                        borderWidth: 2,
+                        borderRadius: 6,
+                        borderSkipped: false,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: { beginAtZero: true, max: 100, ticks: { color: '#64748b' }, grid: { color: 'rgba(148,163,184,0.08)' } },
+                        x: { ticks: { color: '#64748b', maxRotation: 45 }, grid: { display: false } }
+                    }
+                }
+            });
+        </script>
+    }
+}

@@ -1,0 +1,152 @@
+@model SilverOakGateClub.ViewModel.ResultViewModel
+@{
+    ViewData["Title"] = "Test Result";
+}
+
+<div class="page-header">
+    <h1>Test Result</h1>
+    <p>@Model.TestTitle — @Model.BranchName</p>
+</div>
+
+<!-- Result Summary -->
+<div class="row g-4 mb-4">
+    <div class="col-md-4 animate-in">
+        <div class="card text-center" style="padding:32px;">
+            <div class="result-gauge" style="--pct:@Model.Percentage;">
+                <div class="gauge-text">
+                    <div class="gauge-pct">@Model.Percentage%</div>
+                    <div class="gauge-label">Score</div>
+                </div>
+            </div>
+            <h4 style="font-weight:700;">@Model.Score / @Model.TotalMarks</h4>
+            <p style="color:var(--text-muted);">Time: @Model.TimeTakenFormatted</p>
+        </div>
+    </div>
+    <div class="col-md-8 animate-in">
+        <div class="row g-4">
+            <div class="col-sm-4">
+                <div class="stat-card text-center">
+                    <div class="stat-icon green mx-auto"><i class="bi bi-check-lg"></i></div>
+                    <div class="stat-value" style="color:var(--success);">@Model.CorrectAnswers</div>
+                    <div class="stat-label">Correct</div>
+                </div>
+            </div>
+            <div class="col-sm-4">
+                <div class="stat-card text-center">
+                    <div class="stat-icon red mx-auto"><i class="bi bi-x-lg"></i></div>
+                    <div class="stat-value" style="color:var(--danger);">@Model.WrongAnswers</div>
+                    <div class="stat-label">Wrong</div>
+                </div>
+            </div>
+            <div class="col-sm-4">
+                <div class="stat-card text-center">
+                    <div class="stat-icon orange mx-auto"><i class="bi bi-dash-lg"></i></div>
+                    <div class="stat-value" style="color:var(--warning);">@Model.Unanswered</div>
+                    <div class="stat-label">Skipped</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card mt-4">
+            <div class="card-body">
+                <canvas id="resultChart" height="200"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Detailed Review -->
+<div class="card mb-4">
+    <div class="card-header">
+        <h5><i class="bi bi-list-check me-2" style="color:var(--primary);"></i>Question Review</h5>
+    </div>
+    <div class="card-body">
+        @foreach (var q in Model.QuestionReviews)
+        {
+            <div class="question-card">
+                <div class="d-flex align-items-start mb-3">
+                    <span class="question-number">@q.QuestionNumber</span>
+                    <div style="flex:1;">
+                        <div style="font-size:1rem;font-weight:500;">@q.QuestionText</div>
+                        <div class="mt-1">
+                            @if (q.UserAnswer == null)
+                            {
+                                <span class="badge-warning">Skipped</span>
+                            }
+                            else if (q.IsCorrect)
+                            {
+                                <span class="badge-success">Correct (+@q.Marks)</span>
+                            }
+                            else
+                            {
+                                <span class="badge-danger">Wrong</span>
+                            }
+                        </div>
+                    </div>
+                </div>
+
+                @foreach (var opt in new[] { ("A", q.OptionA), ("B", q.OptionB), ("C", q.OptionC), ("D", q.OptionD) })
+                {
+                    var cls = "";
+                    if (opt.Item1 == q.CorrectAnswer) cls = "correct";
+                    else if (opt.Item1 == q.UserAnswer && !q.IsCorrect) cls = "wrong";
+
+                    <div class="option-label @cls" style="cursor:default;">
+                        <span class="option-circle">@opt.Item1</span>
+                        <span class="option-text">@opt.Item2</span>
+                        @if (opt.Item1 == q.CorrectAnswer)
+                        {
+                            <i class="bi bi-check-circle-fill ms-auto" style="color:var(--success);"></i>
+                        }
+                        else if (opt.Item1 == q.UserAnswer && !q.IsCorrect)
+                        {
+                            <i class="bi bi-x-circle-fill ms-auto" style="color:var(--danger);"></i>
+                        }
+                    </div>
+                }
+
+                @if (!string.IsNullOrEmpty(q.Explanation))
+                {
+                    <div class="mt-3 p-3" style="background:rgba(99,102,241,0.05);border-radius:var(--radius-sm);border-left:3px solid var(--primary);">
+                        <strong style="font-size:0.85rem;color:var(--primary-light);"><i class="bi bi-lightbulb me-1"></i>Explanation:</strong>
+                        <p style="margin:4px 0 0;font-size:0.85rem;color:var(--text-secondary);">@q.Explanation</p>
+                    </div>
+                }
+            </div>
+        }
+    </div>
+</div>
+
+<div class="d-flex gap-3">
+    <a href="@Url.Action("History", "Test")" class="btn-outline-custom"><i class="bi bi-clock-history"></i> View History</a>
+    <a href="@Url.Action("Index", "Test")" class="btn-primary-gradient"><i class="bi bi-arrow-left"></i> Back to Tests</a>
+</div>
+
+@section Scripts {
+    <script>
+        const ctx = document.getElementById('resultChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Correct', 'Wrong', 'Skipped'],
+                datasets: [{
+                    data: [@Model.CorrectAnswers, @Model.WrongAnswers, @Model.Unanswered],
+                    backgroundColor: ['#10b981', '#ef4444', '#f59e0b'],
+                    borderColor: '#1e293b',
+                    borderWidth: 3
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: { color: '#94a3b8', padding: 16, usePointStyle: true, font: { size: 12 } }
+                    }
+                },
+                cutout: '60%'
+            }
+        });
+    </script>
+}

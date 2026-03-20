@@ -1,0 +1,68 @@
+@model SilverOakGateClub.ViewModel.CreateLectureViewModel
+@{
+    ViewData["Title"] = "Add Lecture";
+}
+
+<div class="page-header">
+    <h1>Add Lecture</h1>
+    <p>Add a new video lecture</p>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-xl-6">
+        <div class="card">
+            <div class="card-body" style="padding:32px;">
+                <form asp-action="CreateLecture" method="post">
+                    @Html.AntiForgeryToken()
+                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                    <div class="mb-3">
+                        <label asp-for="Title" class="form-label">Title</label>
+                        <input asp-for="Title" class="form-control" placeholder="Lecture title"/>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Description" class="form-label">Description</label>
+                        <textarea asp-for="Description" class="form-control" rows="3" placeholder="Lecture description"></textarea>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="VideoUrl" class="form-label">Video URL</label>
+                        <input asp-for="VideoUrl" class="form-control" placeholder="YouTube URL or direct video link"/>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="ThumbnailUrl" class="form-label">Thumbnail URL (Optional)</label>
+                        <input asp-for="ThumbnailUrl" class="form-control" placeholder="URL to thumbnail image"/>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label asp-for="BranchId" class="form-label">Branch</label>
+                            <select asp-for="BranchId" class="form-select">
+                                <option value="">— Select —</option>
+                                @foreach (var b in Model.Branches)
+                                {
+                                    <option value="@b.Id">@b.Name</option>
+                                }
+                            </select>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label asp-for="Subject" class="form-label">Subject</label>
+                            <input asp-for="Subject" class="form-control" placeholder="e.g., DSA"/>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label asp-for="DurationMinutes" class="form-label">Duration (min)</label>
+                            <input asp-for="DurationMinutes" class="form-control" type="number"/>
+                        </div>
+                    </div>
+
+                    <div class="d-flex gap-3 mt-2">
+                        <button type="submit" class="btn-primary-gradient"><i class="bi bi-plus-circle"></i> Add Lecture</button>
+                        <a href="@Url.Action("Lectures")" class="btn-outline-custom">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

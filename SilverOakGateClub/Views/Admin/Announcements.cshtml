@@ -1,0 +1,60 @@
+@model List<SilverOakGateClub.Models.Announcement>
+@{
+    ViewData["Title"] = "Manage Announcements";
+}
+
+<div class="page-header d-flex justify-content-between align-items-start">
+    <div>
+        <h1>Announcements</h1>
+        <p>Manage notices and announcements</p>
+    </div>
+    <a href="@Url.Action("CreateAnnouncement", "Admin")" class="btn-primary-gradient">
+        <i class="bi bi-megaphone"></i> New Announcement
+    </a>
+</div>
+
+<div class="card">
+    <div class="card-body p-0">
+        @if (Model.Count > 0)
+        {
+            <table class="table-modern">
+                <thead>
+                <tr>
+                    <th>Title</th>
+                    <th>Priority</th>
+                    <th>Branch</th>
+                    <th>Status</th>
+                    <th>Created By</th>
+                    <th>Date</th>
+                    <th>Actions</th>
+                </tr>
+                </thead>
+                <tbody>
+                @foreach (var a in Model)
+                {
+                    var prClass = a.Priority switch { "Urgent" => "badge-danger", "High" => "badge-warning", "Normal" => "badge-primary", _ => "badge-info" };
+                    <tr>
+                        <td style="font-weight:500;">@a.Title</td>
+                        <td><span class="@prClass">@a.Priority</span></td>
+                        <td>@(a.Branch?.Name ?? "All Branches")</td>
+                        <td><span class="@(a.IsActive ? "badge-success" : "badge-warning")">@(a.IsActive ? "Active" : "Inactive")</span></td>
+                        <td style="color:var(--text-muted);">@a.CreatedBy?.FullName</td>
+                        <td style="font-size:0.85rem;color:var(--text-muted);">@a.CreatedAt.ToString("dd MMM yyyy")</td>
+                        <td>
+                            <form asp-action="DeleteAnnouncement" asp-route-id="@a.Id" method="post" style="display:inline;"
+                                  onsubmit="return confirm('Delete this announcement?');">
+                                @Html.AntiForgeryToken()
+                                <button type="submit" class="btn-danger-soft"><i class="bi bi-trash3"></i></button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        }
+        else
+        {
+            <div class="empty-state"><i class="bi bi-megaphone d-block"></i><h5>No announcements yet</h5></div>
+        }
+    </div>
+</div>

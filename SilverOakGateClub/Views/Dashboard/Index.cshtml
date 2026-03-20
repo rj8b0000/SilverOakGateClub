@@ -1,0 +1,256 @@
+@model SilverOakGateClub.ViewModel.DashboardViewModel
+@{
+    ViewData["Title"] = "Dashboard";
+}
+
+<div class="page-header">
+    <h1>Welcome back, @Model.UserName 👋</h1>
+    <p>Here's your GATE preparation overview for <strong>@Model.BranchName</strong></p>
+</div>
+
+<!-- Stats Cards -->
+<div class="row g-4 mb-4">
+    <div class="col-md-6 col-xl-3 animate-in">
+        <div class="stat-card">
+            <div class="stat-icon purple"><i class="bi bi-journal-check"></i></div>
+            <div class="stat-value">@Model.TotalTests</div>
+            <div class="stat-label">Available Tests</div>
+        </div>
+    </div>
+    <div class="col-md-6 col-xl-3 animate-in">
+        <div class="stat-card">
+            <div class="stat-icon green"><i class="bi bi-check-circle"></i></div>
+            <div class="stat-value">@Model.TestsAttempted</div>
+            <div class="stat-label">Tests Attempted</div>
+        </div>
+    </div>
+    <div class="col-md-6 col-xl-3 animate-in">
+        <div class="stat-card">
+            <div class="stat-icon blue"><i class="bi bi-graph-up"></i></div>
+            <div class="stat-value">@Model.AverageScore%</div>
+            <div class="stat-label">Average Score</div>
+        </div>
+    </div>
+    <div class="col-md-6 col-xl-3 animate-in">
+        <div class="stat-card">
+            <div class="stat-icon orange"><i class="bi bi-play-circle"></i></div>
+            <div class="stat-value">@Model.TotalLectures</div>
+            <div class="stat-label">Total Lectures</div>
+        </div>
+    </div>
+</div>
+
+<!-- Charts + Leaderboard -->
+<div class="row g-4 mb-4">
+    <div class="col-xl-8 animate-in">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="bi bi-bar-chart-fill me-2" style="color:var(--primary);"></i>Performance Trend</h5>
+            </div>
+            <div class="card-body">
+                @if (Model.ScoreHistory.Count > 0)
+                {
+                    <canvas id="performanceChart" height="280"></canvas>
+                }
+                else
+                {
+                    <div class="empty-state">
+                        <i class="bi bi-graph-up-arrow d-block"></i>
+                        <h5>No test data yet</h5>
+                        <p>Take your first mock test to see your performance trend!</p>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-4 animate-in">
+        <div class="card" style="height:100%;">
+            <div class="card-header">
+                <h5><i class="bi bi-trophy-fill me-2" style="color:var(--warning);"></i>Leaderboard</h5>
+            </div>
+            <div class="card-body">
+                @if (Model.Leaderboard.Count > 0)
+                {
+                    @foreach (var entry in Model.Leaderboard)
+                    {
+                        var rankClass = entry.Rank == 1 ? "gold" : entry.Rank == 2 ? "silver" : entry.Rank == 3 ? "bronze" : "default";
+                        <div class="leaderboard-item">
+                            <div class="lb-rank @rankClass">@entry.Rank</div>
+                            <div class="lb-info">
+                                <div class="lb-name">@entry.StudentName</div>
+                                <div class="lb-tests">@entry.TestsAttempted tests taken</div>
+                            </div>
+                            <div class="lb-score">@entry.AverageScore%</div>
+                        </div>
+                    }
+                }
+                else
+                {
+                    <div class="empty-state">
+                        <i class="bi bi-trophy d-block"></i>
+                        <p>No leaderboard data yet</p>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Recent Results + Announcements -->
+<div class="row g-4 mb-4">
+    <div class="col-xl-7 animate-in">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="bi bi-clock-history me-2" style="color:var(--secondary);"></i>Recent Results</h5>
+                <a href="@Url.Action("History", "Test")" class="btn-outline-custom btn-sm">View All</a>
+            </div>
+            <div class="card-body p-0">
+                @if (Model.RecentResults.Count > 0)
+                {
+                    <table class="table-modern">
+                        <thead>
+                        <tr>
+                            <th>Test</th>
+                            <th>Score</th>
+                            <th>Percentage</th>
+                            <th>Date</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        @foreach (var r in Model.RecentResults)
+                        {
+                            var pctClass = r.Percentage >= 70 ? "badge-success" : r.Percentage >= 40 ? "badge-warning" : "badge-danger";
+                            <tr>
+                                <td>
+                                    <a href="@Url.Action("Result", "Test", new { id = r.Id })" style="color:var(--text-primary);text-decoration:none;">
+                                        @r.MockTest.Title
+                                    </a>
+                                </td>
+                                <td>@r.Score / @r.TotalMarks</td>
+                                <td><span class="@pctClass">@r.Percentage%</span></td>
+                                <td style="color:var(--text-muted);font-size:0.85rem;">@r.CompletedAt.ToString("dd MMM yyyy")</td>
+                            </tr>
+                        }
+                        </tbody>
+                    </table>
+                }
+                else
+                {
+                    <div class="empty-state">
+                        <i class="bi bi-clipboard-data d-block"></i>
+                        <h5>No results yet</h5>
+                        <p>Start a mock test to see your results here</p>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-5 animate-in">
+        <div class="card" style="height:100%;">
+            <div class="card-header">
+                <h5><i class="bi bi-megaphone-fill me-2" style="color:var(--danger);"></i>Announcements</h5>
+            </div>
+            <div class="card-body">
+                @if (Model.RecentAnnouncements.Count > 0)
+                {
+                    @foreach (var ann in Model.RecentAnnouncements)
+                    {
+                        var priorityClass = ann.Priority.ToLower();
+                        <div class="announcement-item">
+                            <h6><span class="ann-priority @priorityClass"></span>@ann.Title</h6>
+                            <p>@ann.Content.Substring(0, Math.Min(ann.Content.Length, 80))@(ann.Content.Length > 80 ? "..." : "")</p>
+                        </div>
+                    }
+                }
+                else
+                {
+                    <div class="empty-state">
+                        <i class="bi bi-megaphone d-block"></i>
+                        <p>No announcements yet</p>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Actions -->
+<div class="row g-4 mb-4">
+    <div class="col-md-4 animate-in">
+        <a href="@Url.Action("Index", "Test")" style="text-decoration:none;">
+            <div class="stat-card" style="cursor:pointer;">
+                <div class="stat-icon purple"><i class="bi bi-journal-check"></i></div>
+                <h5 style="margin-bottom:4px;">Take a Mock Test</h5>
+                <p style="font-size:0.85rem;color:var(--text-muted);margin:0;">Practice with timed tests</p>
+            </div>
+        </a>
+    </div>
+    <div class="col-md-4 animate-in">
+        <a href="@Url.Action("Index", "Lecture")" style="text-decoration:none;">
+            <div class="stat-card" style="cursor:pointer;">
+                <div class="stat-icon blue"><i class="bi bi-play-circle-fill"></i></div>
+                <h5 style="margin-bottom:4px;">Watch Lectures</h5>
+                <p style="font-size:0.85rem;color:var(--text-muted);margin:0;">Learn from video lectures</p>
+            </div>
+        </a>
+    </div>
+    <div class="col-md-4 animate-in">
+        <a href="@Url.Action("Index", "Notes")" style="text-decoration:none;">
+            <div class="stat-card" style="cursor:pointer;">
+                <div class="stat-icon green"><i class="bi bi-file-earmark-text-fill"></i></div>
+                <h5 style="margin-bottom:4px;">Study Notes</h5>
+                <p style="font-size:0.85rem;color:var(--text-muted);margin:0;">Download study materials</p>
+            </div>
+        </a>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        @if (Model.ScoreHistory.Count > 0)
+        {
+            <text>
+            const ctx = document.getElementById('performanceChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.ScoreLabels)),
+                    datasets: [{
+                        label: 'Score %',
+                        data: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.ScoreHistory)),
+                        borderColor: '#6366f1',
+                        backgroundColor: 'rgba(99, 102, 241, 0.1)',
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.4,
+                        pointBackgroundColor: '#6366f1',
+                        pointBorderColor: '#fff',
+                        pointBorderWidth: 2,
+                        pointRadius: 5,
+                        pointHoverRadius: 7
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100,
+                            ticks: { color: '#64748b', font: { size: 11 } },
+                            grid: { color: 'rgba(148,163,184,0.08)' }
+                        },
+                        x: {
+                            ticks: { color: '#64748b', font: { size: 11 }, maxRotation: 45 },
+                            grid: { display: false }
+                        }
+                    }
+                }
+            });
+            </text>
+        }
+    </script>
+}
