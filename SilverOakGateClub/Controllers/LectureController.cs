@@ -19,18 +19,27 @@ public class LectureController : Controller
     public async Task<IActionResult> Index(string? subject = null)
     {
         var branchId = GetBranchId();
-        if (branchId == null) return RedirectToAction("SelectBranch", "Auth");
 
-        var lectures = string.IsNullOrEmpty(subject)
-            ? await _lectureRepo.GetByBranchAsync(branchId.Value)
-            : await _lectureRepo.GetBySubjectAsync(branchId.Value, subject);
+        List<Models.Lecture> lectures;
+        List<string> subjects;
 
-        var subjects = await _lectureRepo.GetSubjectsByBranchAsync(branchId.Value);
+        if (branchId.HasValue)
+        {
+            lectures = string.IsNullOrEmpty(subject)
+                ? await _lectureRepo.GetByBranchAsync(branchId.Value)
+                : await _lectureRepo.GetBySubjectAsync(branchId.Value, subject);
+            subjects = await _lectureRepo.GetSubjectsByBranchAsync(branchId.Value);
+        }
+        else
+        {
+            lectures = await _lectureRepo.GetAllAsync();
+            subjects = new List<string>();
+        }
 
         var model = new LectureListViewModel
         {
             BranchName = User.FindFirstValue("BranchName") ?? "",
-            BranchId = branchId.Value,
+            BranchId = branchId ?? 0,
             Lectures = lectures,
             Subjects = subjects,
             SelectedSubject = subject

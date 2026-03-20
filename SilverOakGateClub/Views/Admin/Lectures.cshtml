@@ -34,7 +34,7 @@
                 {
                     <tr>
                         <td style="font-weight:500;">@l.Title</td>
-                        <td>@l.Branch?.Name</td>
+                        <td>@(l.Branch?.Name ?? "All Branches")</td>
                         <td>@(l.Subject ?? "—")</td>
                         <td>@l.DurationMinutes min</td>
                         <td>@l.ViewCount</td>

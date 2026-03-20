@@ -23,7 +23,7 @@ public class LectureRepository : ILectureRepository
     public async Task<List<Lecture>> GetByBranchAsync(int branchId)
     {
         return await _context.Lectures
-            .Where(l => l.BranchId == branchId && l.IsActive)
+            .Where(l => (l.BranchId == branchId || l.BranchId == null) && l.IsActive)
             .Include(l => l.Branch)
             .OrderBy(l => l.OrderIndex)
             .ToListAsync();
@@ -79,7 +79,7 @@ public class LectureRepository : ILectureRepository
     public async Task<List<Lecture>> GetBySubjectAsync(int branchId, string subject)
     {
         return await _context.Lectures
-            .Where(l => l.BranchId == branchId && l.Subject == subject && l.IsActive)
+            .Where(l => (l.BranchId == branchId || l.BranchId == null) && l.Subject == subject && l.IsActive)
             .OrderBy(l => l.OrderIndex)
             .ToListAsync();
     }
@@ -87,7 +87,7 @@ public class LectureRepository : ILectureRepository
     public async Task<List<string>> GetSubjectsByBranchAsync(int branchId)
     {
         return await _context.Lectures
-            .Where(l => l.BranchId == branchId && l.IsActive && l.Subject != null)
+            .Where(l => (l.BranchId == branchId || l.BranchId == null) && l.IsActive && l.Subject != null)
             .Select(l => l.Subject!)
             .Distinct()
             .OrderBy(s => s)

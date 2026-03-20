@@ -25,7 +25,7 @@ public class AuthController : Controller
     public IActionResult Login(string? returnUrl = null)
     {
         if (User.Identity?.IsAuthenticated == true)
-            return RedirectToAction("SelectBranch");
+            return RedirectToAction("Index", "Dashboard");
 
         return View(new LoginViewModel { ReturnUrl = returnUrl });
     }
@@ -88,60 +88,9 @@ public class AuthController : Controller
         if (!string.IsNullOrEmpty(model.ReturnUrl) && Url.IsLocalUrl(model.ReturnUrl))
             return Redirect(model.ReturnUrl);
 
-        return RedirectToAction("SelectBranch");
-    }
-
-    [Authorize]
-    [HttpGet]
-    public async Task<IActionResult> SelectBranch()
-    {
-        if (User.IsInRole("Admin"))
-            return RedirectToAction("Index", "Admin");
-
-        var branches = await _branchRepo.GetAllActiveAsync();
-        var model = new BranchSelectionViewModel
-        {
-            Branches = branches,
-            SelectedBranchId = GetBranchId()
-        };
-        return View(model);
-    }
-
-    [Authorize]
-    [HttpPost]
-    [ValidateAntiForgeryToken]
-    public async Task<IActionResult> SelectBranch(int branchId)
-    {
-        var branch = await _branchRepo.GetByIdAsync(branchId);
-        if (branch == null)
-            return RedirectToAction("SelectBranch");
-
-        var userId = GetUserId();
-        var user = await _userRepo.GetByIdAsync(userId);
-        if (user != null)
-        {
-            user.BranchId = branchId;
-            await _userRepo.UpdateAsync(user);
-        }
-
-        // Re-sign in with updated branch claim
-        var claims = new List<Claim>
-        {
-            new(ClaimTypes.NameIdentifier, userId.ToString()),
-            new(ClaimTypes.Name, user!.FullName),
-            new(ClaimTypes.Email, user.Email),
-            new(ClaimTypes.Role, user.Role),
-            new("BranchId", branchId.ToString()),
-            new("BranchName", branch.Name),
-        };
-
-        var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-        var principal = new ClaimsPrincipal(identity);
-
-        await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal);
-
         return RedirectToAction("Index", "Dashboard");
     }
+
 
     [HttpPost]
     [ValidateAntiForgeryToken]

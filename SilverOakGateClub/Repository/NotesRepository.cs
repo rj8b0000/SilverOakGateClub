@@ -24,7 +24,7 @@ public class NotesRepository : INotesRepository
     public async Task<List<Notes>> GetByBranchAsync(int branchId)
     {
         return await _context.Notes
-            .Where(n => n.BranchId == branchId && n.IsActive)
+            .Where(n => (n.BranchId == branchId || n.BranchId == null) && n.IsActive)
             .Include(n => n.Branch)
             .Include(n => n.UploadedBy)
             .OrderByDescending(n => n.CreatedAt)
@@ -93,7 +93,7 @@ public class NotesRepository : INotesRepository
     public async Task<List<Notes>> GetBySubjectAsync(int branchId, string subject)
     {
         return await _context.Notes
-            .Where(n => n.BranchId == branchId && n.Subject == subject && n.IsActive)
+            .Where(n => (n.BranchId == branchId || n.BranchId == null) && n.Subject == subject && n.IsActive)
             .Include(n => n.UploadedBy)
             .OrderByDescending(n => n.CreatedAt)
             .ToListAsync();
@@ -102,7 +102,7 @@ public class NotesRepository : INotesRepository
     public async Task<List<string>> GetSubjectsByBranchAsync(int branchId)
     {
         return await _context.Notes
-            .Where(n => n.BranchId == branchId && n.IsActive && n.Subject != null)
+            .Where(n => (n.BranchId == branchId || n.BranchId == null) && n.IsActive && n.Subject != null)
             .Select(n => n.Subject!)
             .Distinct()
             .OrderBy(s => s)
@@ -112,7 +112,7 @@ public class NotesRepository : INotesRepository
     public async Task<List<Notes>> GetTopRatedAsync(int branchId, int top = 10)
     {
         return await _context.Notes
-            .Where(n => n.BranchId == branchId && n.IsActive)
+            .Where(n => (n.BranchId == branchId || n.BranchId == null) && n.IsActive)
             .Include(n => n.UploadedBy)
             .OrderByDescending(n => n.AverageRating)
             .Take(top)

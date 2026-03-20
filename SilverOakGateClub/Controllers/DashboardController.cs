@@ -34,16 +34,17 @@ public class DashboardController : Controller
         var userId = GetUserId();
         var branchId = GetBranchId();
 
-        if (branchId == null)
-            return RedirectToAction("SelectBranch", "Auth");
-
         var user = await _userRepo.GetByIdAsync(userId);
         var results = await _testRepo.GetResultsByUserAsync(userId);
         var announcements = await _announcementRepo.GetActiveAsync(branchId);
-        var tests = await _testRepo.GetTestsByBranchAsync(branchId.Value);
+        var tests = branchId.HasValue
+            ? await _testRepo.GetTestsByBranchAsync(branchId.Value)
+            : new List<Models.MockTest>();
 
         // Build leaderboard
-        var leaderboardUsers = await _userRepo.GetLeaderboardAsync(branchId.Value);
+        var leaderboardUsers = branchId.HasValue
+            ? await _userRepo.GetLeaderboardAsync(branchId.Value)
+            : new List<Models.User>();
         var leaderboard = leaderboardUsers.Select((u, i) => new LeaderboardEntry
         {
             Rank = i + 1,
@@ -57,7 +58,7 @@ public class DashboardController : Controller
         {
             UserName = user?.FullName ?? "",
             BranchName = User.FindFirstValue("BranchName") ?? "",
-            BranchId = branchId.Value,
+            BranchId = branchId ?? 0,
             Role = User.FindFirstValue(ClaimTypes.Role) ?? "Student",
             TotalTests = tests.Count,
             TestsAttempted = results.Count,

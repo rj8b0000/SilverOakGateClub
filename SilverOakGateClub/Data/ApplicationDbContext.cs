@@ -39,7 +39,7 @@ public class ApplicationDbContext : DbContext
             entity.HasOne(m => m.Branch)
                   .WithMany(b => b.MockTests)
                   .HasForeignKey(m => m.BranchId)
-                  .OnDelete(DeleteBehavior.Restrict);
+                  .OnDelete(DeleteBehavior.SetNull);
         });
 
         // Question
@@ -71,7 +71,7 @@ public class ApplicationDbContext : DbContext
             entity.HasOne(l => l.Branch)
                   .WithMany(b => b.Lectures)
                   .HasForeignKey(l => l.BranchId)
-                  .OnDelete(DeleteBehavior.Restrict);
+                  .OnDelete(DeleteBehavior.SetNull);
         });
 
         // Notes
@@ -80,7 +80,7 @@ public class ApplicationDbContext : DbContext
             entity.HasOne(n => n.Branch)
                   .WithMany(b => b.Notes)
                   .HasForeignKey(n => n.BranchId)
-                  .OnDelete(DeleteBehavior.Restrict);
+                  .OnDelete(DeleteBehavior.SetNull);
 
             entity.HasOne(n => n.UploadedBy)
                   .WithMany()

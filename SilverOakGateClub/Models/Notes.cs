@@ -21,8 +21,8 @@ public class Notes
 
     public long FileSizeBytes { get; set; }
 
-    public int BranchId { get; set; }
-    public Branch Branch { get; set; } = null!;
+    public int? BranchId { get; set; }
+    public Branch? Branch { get; set; }
 
     [MaxLength(100)]
     public string? Subject { get; set; }

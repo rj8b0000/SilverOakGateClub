@@ -36,7 +36,7 @@
                 {
                     <tr>
                         <td style="font-weight:500;">@t.Title</td>
-                        <td>@t.Branch?.Name</td>
+                        <td>@(t.Branch?.Name ?? "All Branches")</td>
                         <td><span class="@(t.IsPYQ ? "badge-info" : "badge-primary")">@(t.IsPYQ ? "PYQ" : "Mock")</span></td>
                         <td>@t.DurationMinutes min</td>
                         <td>@t.TotalQuestions</td>

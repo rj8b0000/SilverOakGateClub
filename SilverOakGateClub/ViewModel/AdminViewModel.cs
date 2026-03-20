@@ -50,8 +50,7 @@ public class CreateTestViewModel
     [MaxLength(1000)]
     public string? Description { get; set; }
 
-    [Required]
-    public int BranchId { get; set; }
+    public int? BranchId { get; set; }
 
     [Required, Range(1, 300)]
     public int DurationMinutes { get; set; } = 60;
@@ -108,8 +107,7 @@ public class CreateLectureViewModel
     [MaxLength(500)]
     public string? ThumbnailUrl { get; set; }
 
-    [Required]
-    public int BranchId { get; set; }
+    public int? BranchId { get; set; }
 
     [MaxLength(100)]
     public string? Subject { get; set; }
@@ -127,8 +125,7 @@ public class CreateNotesViewModel
     [MaxLength(1000)]
     public string? Description { get; set; }
 
-    [Required]
-    public int BranchId { get; set; }
+    public int? BranchId { get; set; }
 
     [MaxLength(100)]
     public string? Subject { get; set; }

@@ -32,7 +32,7 @@ public class TestRepository : ITestRepository
     public async Task<List<MockTest>> GetTestsByBranchAsync(int branchId, bool isPYQ = false)
     {
         return await _context.MockTests
-            .Where(t => t.BranchId == branchId && t.IsActive && t.IsPYQ == isPYQ)
+            .Where(t => (t.BranchId == branchId || t.BranchId == null) && t.IsActive && t.IsPYQ == isPYQ)
             .Include(t => t.Branch)
             .OrderByDescending(t => t.CreatedAt)
             .ToListAsync();
@@ -172,7 +172,7 @@ public class TestRepository : ITestRepository
     public async Task<List<MockTest>> GetPYQsByBranchAsync(int branchId)
     {
         return await _context.MockTests
-            .Where(t => t.BranchId == branchId && t.IsPYQ && t.IsActive)
+            .Where(t => (t.BranchId == branchId || t.BranchId == null) && t.IsPYQ && t.IsActive)
             .Include(t => t.Branch)
             .OrderByDescending(t => t.Year)
             .ToListAsync();

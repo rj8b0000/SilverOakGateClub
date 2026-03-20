@@ -150,7 +150,7 @@ namespace SilverOakGateClub.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("BranchId")
+                    b.Property<int?>("BranchId")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("CreatedAt")
@@ -205,7 +205,7 @@ namespace SilverOakGateClub.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("BranchId")
+                    b.Property<int?>("BranchId")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("CreatedAt")
@@ -260,7 +260,7 @@ namespace SilverOakGateClub.Migrations
                     b.Property<double>("AverageRating")
                         .HasColumnType("float");
 
-                    b.Property<int>("BranchId")
+                    b.Property<int?>("BranchId")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("CreatedAt")
@@ -513,8 +513,7 @@ namespace SilverOakGateClub.Migrations
                     b.HasOne("SilverOakGateClub.Models.Branch", "Branch")
                         .WithMany("Lectures")
                         .HasForeignKey("BranchId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.SetNull);
 
                     b.Navigation("Branch");
                 });
@@ -524,8 +523,7 @@ namespace SilverOakGateClub.Migrations
                     b.HasOne("SilverOakGateClub.Models.Branch", "Branch")
                         .WithMany("MockTests")
                         .HasForeignKey("BranchId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.SetNull);
 
                     b.Navigation("Branch");
                 });
@@ -535,8 +533,7 @@ namespace SilverOakGateClub.Migrations
                     b.HasOne("SilverOakGateClub.Models.Branch", "Branch")
                         .WithMany("Notes")
                         .HasForeignKey("BranchId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.SetNull);
 
                     b.HasOne("SilverOakGateClub.Models.User", "UploadedBy")
                         .WithMany()

@@ -22,13 +22,14 @@ public class TestController : Controller
     public async Task<IActionResult> Index()
     {
         var branchId = GetBranchId();
-        if (branchId == null) return RedirectToAction("SelectBranch", "Auth");
 
-        var tests = await _testRepo.GetTestsByBranchAsync(branchId.Value);
+        var tests = branchId.HasValue
+            ? await _testRepo.GetTestsByBranchAsync(branchId.Value)
+            : new List<MockTest>();
         var model = new TestListViewModel
         {
             BranchName = User.FindFirstValue("BranchName") ?? "",
-            BranchId = branchId.Value,
+            BranchId = branchId ?? 0,
             Tests = tests,
             IsPYQ = false
         };
@@ -39,13 +40,14 @@ public class TestController : Controller
     public async Task<IActionResult> PYQ()
     {
         var branchId = GetBranchId();
-        if (branchId == null) return RedirectToAction("SelectBranch", "Auth");
 
-        var pyqs = await _testRepo.GetPYQsByBranchAsync(branchId.Value);
+        var pyqs = branchId.HasValue
+            ? await _testRepo.GetPYQsByBranchAsync(branchId.Value)
+            : new List<MockTest>();
         var model = new TestListViewModel
         {
             BranchName = User.FindFirstValue("BranchName") ?? "",
-            BranchId = branchId.Value,
+            BranchId = branchId ?? 0,
             Tests = pyqs,
             IsPYQ = true
         };
@@ -66,7 +68,7 @@ public class TestController : Controller
             DurationMinutes = test.DurationMinutes,
             TotalQuestions = test.Questions.Count,
             TotalMarks = test.Questions.Sum(q => q.Marks),
-            BranchName = test.Branch.Name,
+            BranchName = test.Branch?.Name ?? "All Branches",
             Questions = test.Questions.Select((q, i) => new QuestionViewModel
             {
                 QuestionId = q.Id,

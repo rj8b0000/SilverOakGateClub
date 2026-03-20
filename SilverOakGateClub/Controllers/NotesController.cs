@@ -22,18 +22,27 @@ public class NotesController : Controller
     public async Task<IActionResult> Index(string? subject = null)
     {
         var branchId = GetBranchId();
-        if (branchId == null) return RedirectToAction("SelectBranch", "Auth");
 
-        var notes = string.IsNullOrEmpty(subject)
-            ? await _notesRepo.GetByBranchAsync(branchId.Value)
-            : await _notesRepo.GetBySubjectAsync(branchId.Value, subject);
+        List<Models.Notes> notes;
+        List<string> subjects;
 
-        var subjects = await _notesRepo.GetSubjectsByBranchAsync(branchId.Value);
+        if (branchId.HasValue)
+        {
+            notes = string.IsNullOrEmpty(subject)
+                ? await _notesRepo.GetByBranchAsync(branchId.Value)
+                : await _notesRepo.GetBySubjectAsync(branchId.Value, subject);
+            subjects = await _notesRepo.GetSubjectsByBranchAsync(branchId.Value);
+        }
+        else
+        {
+            notes = await _notesRepo.GetAllAsync();
+            subjects = new List<string>();
+        }
 
         var model = new NotesListViewModel
         {
             BranchName = User.FindFirstValue("BranchName") ?? "",
-            BranchId = branchId.Value,
+            BranchId = branchId ?? 0,
             NotesList = notes,
             Subjects = subjects,
             SelectedSubject = subject

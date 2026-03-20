@@ -33,7 +33,7 @@
                         <div class="col-md-4 mb-3">
                             <label asp-for="BranchId" class="form-label">Branch</label>
                             <select asp-for="BranchId" class="form-select">
-                                <option value="">— Select —</option>
+                                <option value="">— All Branches —</option>
                                 @foreach (var b in Model.Branches)
                                 {
                                     <option value="@b.Id">@b.Name</option>

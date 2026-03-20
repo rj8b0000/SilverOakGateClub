@@ -13,8 +13,8 @@ public class MockTest
     [MaxLength(1000)]
     public string? Description { get; set; }
 
-    public int BranchId { get; set; }
-    public Branch Branch { get; set; } = null!;
+    public int? BranchId { get; set; }
+    public Branch? Branch { get; set; }
 
     public int DurationMinutes { get; set; } = 60;
 
