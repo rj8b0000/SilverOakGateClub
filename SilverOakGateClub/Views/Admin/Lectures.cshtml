@@ -40,11 +40,14 @@
                         <td>@l.ViewCount</td>
                         <td style="font-size:0.85rem;color:var(--text-muted);">@l.CreatedAt.ToString("dd MMM yyyy")</td>
                         <td>
-                            <form asp-action="DeleteLecture" asp-route-id="@l.Id" method="post" style="display:inline;"
-                                  onsubmit="return confirm('Delete this lecture?');">
-                                @Html.AntiForgeryToken()
-                                <button type="submit" class="btn-danger-soft"><i class="bi bi-trash3"></i></button>
-                            </form>
+                            <div class="action-btns">
+                                <a href="@Url.Action("EditLecture", "Admin", new { id = l.Id })" class="btn-info-soft btn-sm"><i class="bi bi-pencil"></i></a>
+                                <form asp-action="DeleteLecture" asp-route-id="@l.Id" method="post" style="display:inline;"
+                                      onsubmit="return confirm('Delete this lecture?');">
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit" class="btn-danger-soft btn-sm"><i class="bi bi-trash3"></i></button>
+                                </form>
+                            </div>
                         </td>
                     </tr>
                 }

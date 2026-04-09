@@ -1,0 +1,225 @@
+@model SilverOakGateClub.ViewModel.EditTestViewModel
+@{ ViewData["Title"] = "Edit Test"; }
+
+<div class="page-header">
+    <h1>Edit Test</h1>
+    <p>Modify test details and manage questions</p>
+</div>
+
+<div class="card mb-4">
+    <div class="card-header">
+        <h5><i class="bi bi-pencil-square me-2" style="color:var(--primary);"></i>Test Details</h5>
+    </div>
+    <div class="card-body" style="padding:28px;">
+        <form asp-action="EditTest" asp-controller="Admin" method="post">
+            @Html.AntiForgeryToken()
+            <input type="hidden" asp-for="Id" />
+            <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+            <div class="row g-3 mb-4">
+                <div class="col-md-7">
+                    <label asp-for="Title" class="form-label">Test Title *</label>
+                    <input asp-for="Title" class="form-control" placeholder="e.g., GATE CS 2025 Mock Test 1" />
+                    <span asp-validation-for="Title" class="text-danger"></span>
+                </div>
+                <div class="col-md-3">
+                    <label asp-for="DurationMinutes" class="form-label">Duration (min) *</label>
+                    <input asp-for="DurationMinutes" type="number" class="form-control" />
+                    <span asp-validation-for="DurationMinutes" class="text-danger"></span>
+                </div>
+                <div class="col-md-2">
+                    <label asp-for="Year" class="form-label">Year</label>
+                    <input asp-for="Year" type="number" class="form-control" placeholder="2024" />
+                </div>
+            </div>
+
+            <div class="mb-4">
+                <label asp-for="Description" class="form-label">Description</label>
+                <textarea asp-for="Description" class="form-control" rows="2" placeholder="Brief description of the test"></textarea>
+            </div>
+
+            <div class="row g-3 mb-4">
+                <div class="col-md-4">
+                    <label asp-for="BranchId" class="form-label">Department</label>
+                    <select asp-for="BranchId" class="form-select">
+                        <option value="">— All Branches —</option>
+                        @foreach (var b in Model.Branches)
+                        {
+                            <option value="@b.Id">@b.Name</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-md-2 d-flex align-items-end">
+                    <div class="form-check mb-2">
+                        <input asp-for="IsPYQ" class="form-check-input" />
+                        <label asp-for="IsPYQ" class="form-check-label">Is PYQ?</label>
+                    </div>
+                </div>
+                <div class="col-md-2 d-flex align-items-end">
+                    <div class="form-check mb-2">
+                        <input asp-for="IsActive" class="form-check-input" />
+                        <label asp-for="IsActive" class="form-check-label">Active</label>
+                    </div>
+                </div>
+            </div>
+
+            <hr style="border-color:var(--border-color);margin:32px 0;" />
+
+            <h5 style="font-weight:600;margin-bottom:20px;display:flex;justify-content:space-between;align-items:center;">
+                <span><i class="bi bi-list-check me-2" style="color:var(--primary);"></i>Questions</span>
+                <span class="badge-primary" id="questionCountBadge" style="font-size:0.8rem;">@Model.Questions.Count Questions</span>
+            </h5>
+
+            <div id="questionsContainer">
+                @for (int i = 0; i < Model.Questions.Count; i++)
+                {
+                    <div class="card mb-4 question-card animate-in" id="question_@i" style="border:1px solid var(--border-color);box-shadow:none;">
+                        <input type="hidden" name="Questions[@i].Id" value="@Model.Questions[i].Id" />
+                        <div class="card-header d-flex justify-content-between align-items-center" style="background:var(--bg-secondary);border-bottom:1px solid var(--border-color);">
+                            <h6 class="mb-0" style="font-weight:600;">Question @(i + 1)</h6>
+                            <button type="button" class="btn btn-sm btn-danger-soft" onclick="removeQuestion(@i)">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <label class="form-label">Question Text *</label>
+                                <textarea name="Questions[@i].QuestionText" class="form-control" rows="2" required>@Model.Questions[i].QuestionText</textarea>
+                            </div>
+                            <div class="row g-3 mb-3">
+                                <div class="col-md-6">
+                                    <label class="form-label">Option A *</label>
+                                    <input name="Questions[@i].OptionA" value="@Model.Questions[i].OptionA" class="form-control" required />
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Option B *</label>
+                                    <input name="Questions[@i].OptionB" value="@Model.Questions[i].OptionB" class="form-control" required />
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Option C *</label>
+                                    <input name="Questions[@i].OptionC" value="@Model.Questions[i].OptionC" class="form-control" required />
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Option D *</label>
+                                    <input name="Questions[@i].OptionD" value="@Model.Questions[i].OptionD" class="form-control" required />
+                                </div>
+                            </div>
+                            <div class="row g-3">
+                                <div class="col-md-4">
+                                    <label class="form-label">Correct Answer *</label>
+                                    <select name="Questions[@i].CorrectAnswer" class="form-select" required>
+                                        <option value="A" selected="@(Model.Questions[i].CorrectAnswer == "A")">A</option>
+                                        <option value="B" selected="@(Model.Questions[i].CorrectAnswer == "B")">B</option>
+                                        <option value="C" selected="@(Model.Questions[i].CorrectAnswer == "C")">C</option>
+                                        <option value="D" selected="@(Model.Questions[i].CorrectAnswer == "D")">D</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label">Marks</label>
+                                    <input name="Questions[@i].Marks" type="number" class="form-control" value="@Model.Questions[i].Marks" min="1" />
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label">Negative Marks</label>
+                                    <input name="Questions[@i].NegativeMarks" type="number" class="form-control" value="@Model.Questions[i].NegativeMarks" min="0" />
+                                </div>
+                            </div>
+                            <div class="mt-3">
+                                <label class="form-label">Explanation</label>
+                                <textarea name="Questions[@i].Explanation" class="form-control" rows="2">@Model.Questions[i].Explanation</textarea>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+
+            <button type="button" class="btn-outline-custom mb-5" onclick="addQuestion()">
+                <i class="bi bi-plus-circle"></i> Add New Question
+            </button>
+
+            <div class="d-flex gap-3 pt-4" style="border-top:1px solid var(--border-color);">
+                <button type="submit" class="btn-primary-gradient px-4">
+                    <i class="bi bi-check2-circle"></i> Update Test
+                </button>
+                <a href="@Url.Action("Tests", "Admin")" class="btn-outline-custom">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        let questionCount = @Model.Questions.Count;
+
+        function addQuestion() {
+            const idx = questionCount++;
+            const html = `
+            <div class="card mb-4 question-card animate-in" id="question_${idx}" style="border:1px solid var(--border-color);box-shadow:none;">
+                <div class="card-header d-flex justify-content-between align-items-center" style="background:var(--bg-secondary);border-bottom:1px solid var(--border-color);">
+                    <h6 class="mb-0" style="font-weight:600;">Question ${idx + 1}</h6>
+                    <button type="button" class="btn btn-sm btn-danger-soft" onclick="removeQuestion(${idx})">
+                        <i class="bi bi-trash"></i>
+                    </button>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label class="form-label">Question Text *</label>
+                        <textarea name="Questions[${idx}].QuestionText" class="form-control" rows="2" required></textarea>
+                    </div>
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Option A *</label>
+                            <input name="Questions[${idx}].OptionA" class="form-control" required />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Option B *</label>
+                            <input name="Questions[${idx}].OptionB" class="form-control" required />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Option C *</label>
+                            <input name="Questions[${idx}].OptionC" class="form-control" required />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Option D *</label>
+                            <input name="Questions[${idx}].OptionD" class="form-control" required />
+                        </div>
+                    </div>
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <label class="form-label">Correct Answer *</label>
+                            <select name="Questions[${idx}].CorrectAnswer" class="form-select" required>
+                                <option value="A">A</option>
+                                <option value="B">B</option>
+                                <option value="C">C</option>
+                                <option value="D">D</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Marks</label>
+                            <input name="Questions[${idx}].Marks" type="number" class="form-control" value="1" min="1" />
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Negative Marks</label>
+                            <input name="Questions[${idx}].NegativeMarks" type="number" class="form-control" value="0" min="0" />
+                        </div>
+                    </div>
+                    <div class="mt-3">
+                        <label class="form-label">Explanation</label>
+                        <textarea name="Questions[${idx}].Explanation" class="form-control" rows="2"></textarea>
+                    </div>
+                </div>
+            </div>`;
+            document.getElementById('questionsContainer').insertAdjacentHTML('beforeend', html);
+            updateBadge();
+        }
+
+        function removeQuestion(idx) {
+            document.getElementById(`question_${idx}`).remove();
+            updateBadge();
+        }
+
+        function updateBadge() {
+            const count = document.querySelectorAll('.question-card').length;
+            document.getElementById('questionCountBadge').innerText = count + ' Questions';
+        }
+    </script>
+}

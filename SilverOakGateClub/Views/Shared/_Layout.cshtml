@@ -3,6 +3,7 @@
     var userName = User.Identity?.Name ?? "";
     var userRole = User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value ?? "";
     var isAdmin = userRole == "Admin";
+    var isTeacher = userRole == "Teacher";
     var branchName = User.FindFirst("BranchName")?.Value ?? "";
     var currentController = ViewContext.RouteData.Values["controller"]?.ToString() ?? "";
     var currentAction = ViewContext.RouteData.Values["action"]?.ToString() ?? "";
@@ -59,6 +60,9 @@ else if (isAuthenticated)
                     <a class="nav-link @(currentController == "Admin" && currentAction == "Users" ? "active" : "")" href="@Url.Action("Users", "Admin")">
                         <i class="bi bi-people-fill"></i> Users
                     </a>
+                    <a class="nav-link @(currentController == "Admin" && (currentAction == "Teachers" || currentAction == "CreateTeacher" || currentAction == "EditTeacher") ? "active" : "")" href="@Url.Action("Teachers", "Admin")">
+                        <i class="bi bi-person-badge-fill"></i> Teachers
+                    </a>
                     <a class="nav-link @(currentController == "Admin" && currentAction == "Tests" ? "active" : "")" href="@Url.Action("Tests", "Admin")">
                         <i class="bi bi-journal-check"></i> Tests
                     </a>
@@ -70,6 +74,30 @@ else if (isAuthenticated)
                     </a>
                     <a class="nav-link @(currentController == "Admin" && currentAction == "Announcements" ? "active" : "")" href="@Url.Action("Announcements", "Admin")">
                         <i class="bi bi-megaphone-fill"></i> Announcements
+                    </a>
+                </div>
+            }
+            else if (isTeacher)
+            {
+                <div class="nav-section">
+                    <div class="nav-section-title">Teacher Panel</div>
+                    <a class="nav-link @(currentController == "Teacher" && currentAction == "Index" ? "active" : "")" href="@Url.Action("Index", "Teacher")">
+                        <i class="bi bi-grid-1x2-fill"></i> Dashboard
+                    </a>
+                    <a class="nav-link @(currentController == "Teacher" && currentAction == "MyContent" ? "active" : "")" href="@Url.Action("MyContent", "Teacher")">
+                        <i class="bi bi-collection-fill"></i> My Content
+                    </a>
+                </div>
+                <div class="nav-section">
+                    <div class="nav-section-title">Upload</div>
+                    <a class="nav-link @(currentController == "Teacher" && currentAction == "CreateNotes" ? "active" : "")" href="@Url.Action("CreateNotes", "Teacher")">
+                        <i class="bi bi-file-earmark-plus-fill"></i> Upload Notes
+                    </a>
+                    <a class="nav-link @(currentController == "Teacher" && currentAction == "CreateLecture" ? "active" : "")" href="@Url.Action("CreateLecture", "Teacher")">
+                        <i class="bi bi-camera-video-fill"></i> Add Lecture
+                    </a>
+                    <a class="nav-link @(currentController == "Teacher" && currentAction == "CreateTest" ? "active" : "")" href="@Url.Action("CreateTest", "Teacher")">
+                        <i class="bi bi-journal-plus"></i> Create Test
                     </a>
                 </div>
             }
@@ -125,6 +153,9 @@ else if (isAuthenticated)
                         <i class="bi bi-building"></i> @branchName
                     </span>
                 }
+                <span class="badge-info d-none d-md-inline">
+                    <i class="bi bi-person"></i> @userRole
+                </span>
                 <div class="dropdown">
                     <div class="user-dropdown" data-bs-toggle="dropdown" aria-expanded="false">
                         <div class="user-avatar">@initials</div>

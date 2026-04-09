@@ -1,0 +1,86 @@
+@model SilverOakGateClub.ViewModel.TeacherDashboardViewModel
+@{ ViewData["Title"] = "Teacher Dashboard"; }
+
+<div class="page-header">
+    <h1>Welcome, @Model.TeacherName</h1>
+    <p>Manage your content and view your assigned departments</p>
+</div>
+
+<!-- Stats -->
+<div class="row g-3 mb-4">
+    <div class="col-md-4">
+        <div class="stat-card">
+            <div class="stat-icon blue"><i class="bi bi-building"></i></div>
+            <div class="stat-value">@Model.AssignedDepartments.Count</div>
+            <div class="stat-label">Assigned Departments</div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="stat-card">
+            <div class="stat-icon green"><i class="bi bi-file-earmark-text"></i></div>
+            <div class="stat-value">@Model.TotalNotesUploaded</div>
+            <div class="stat-label">Notes Uploaded</div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="stat-card">
+            <div class="stat-icon purple"><i class="bi bi-play-circle"></i></div>
+            <div class="stat-value">@Model.TotalLecturesCreated</div>
+            <div class="stat-label">Lectures Created</div>
+        </div>
+    </div>
+</div>
+
+<!-- Assigned Departments -->
+<div class="card mb-4">
+    <div class="card-header">
+        <h5><i class="bi bi-building me-2"></i>Your Assigned Departments</h5>
+    </div>
+    <div class="card-body">
+        @if (Model.AssignedDepartments.Count == 0)
+        {
+            <div class="empty-state">
+                <i class="bi bi-building"></i>
+                <p>No departments assigned yet. Contact your administrator.</p>
+            </div>
+        }
+        else
+        {
+            <div class="row g-3">
+                @foreach (var dept in Model.AssignedDepartments)
+                {
+                    <div class="col-md-4">
+                        <div class="stat-card" style="text-align:center;">
+                            <div class="stat-icon blue mx-auto"><i class="bi bi-mortarboard"></i></div>
+                            <div style="font-weight:600; font-size:0.95rem;">@dept.Name</div>
+                            <div style="color:var(--text-muted); font-size:0.8rem;">Code: @dept.Code</div>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+    </div>
+</div>
+
+<!-- Quick Actions -->
+<div class="card">
+    <div class="card-header">
+        <h5><i class="bi bi-lightning me-2"></i>Quick Actions</h5>
+    </div>
+    <div class="card-body">
+        <div class="d-flex gap-2 flex-wrap">
+            <a href="@Url.Action("CreateNotes", "Teacher")" class="btn-primary-gradient">
+                <i class="bi bi-file-earmark-plus"></i> Upload Notes
+            </a>
+            <a href="@Url.Action("CreateLecture", "Teacher")" class="btn-outline-custom">
+                <i class="bi bi-camera-video"></i> Add Lecture
+            </a>
+            <a href="@Url.Action("CreateTest", "Teacher")" class="btn-outline-custom">
+                <i class="bi bi-journal-plus"></i> Create Test
+            </a>
+            <a href="@Url.Action("MyContent", "Teacher")" class="btn-outline-custom">
+                <i class="bi bi-collection"></i> View My Content
+            </a>
+        </div>
+    </div>
+</div>

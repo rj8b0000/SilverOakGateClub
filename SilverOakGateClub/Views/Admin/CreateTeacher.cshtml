@@ -1,0 +1,40 @@
+@model SilverOakGateClub.ViewModel.CreateTeacherViewModel
+@{ ViewData["Title"] = "Create Teacher"; }
+
+<div class="page-header"><h1>Create Teacher</h1><p>Add a new teacher and assign departments</p></div>
+
+<div class="card" style="max-width:700px;">
+    <div class="card-body">
+        <form asp-action="CreateTeacher" asp-controller="Admin" method="post">
+            @Html.AntiForgeryToken()
+
+            <div class="mb-3"><label class="form-label">Full Name *</label><input asp-for="FullName" class="form-control" placeholder="Teacher's full name" /><span asp-validation-for="FullName" class="text-danger" style="font-size:0.8rem;"></span></div>
+            <div class="row g-3 mb-3">
+                <div class="col-md-6"><label class="form-label">Email *</label><input asp-for="Email" type="email" class="form-control" /><span asp-validation-for="Email" class="text-danger" style="font-size:0.8rem;"></span></div>
+                <div class="col-md-6"><label class="form-label">Password *</label><input asp-for="Password" type="password" class="form-control" /><span asp-validation-for="Password" class="text-danger" style="font-size:0.8rem;"></span></div>
+            </div>
+            <div class="mb-3"><label class="form-label">Phone</label><input asp-for="Phone" class="form-control" /></div>
+
+            <div class="mb-3">
+                <label class="form-label">Assign Departments *</label>
+                <div class="multi-select-container">
+                    @foreach (var dept in Model.AllDepartments)
+                    {
+                        <label class="multi-select-item">
+                            <input type="checkbox" name="SelectedDepartmentIds" value="@dept.Id" />
+                            <span>@dept.Name</span>
+                            <span class="badge-secondary ms-auto">@dept.Code</span>
+                        </label>
+                    }
+                </div>
+            </div>
+
+            <div asp-validation-summary="All" class="text-danger mb-3" style="font-size:0.85rem;"></div>
+
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn-primary-gradient"><i class="bi bi-person-plus"></i> Create Teacher</button>
+                <a href="@Url.Action("Teachers", "Admin")" class="btn-outline-custom">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>

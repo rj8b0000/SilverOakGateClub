@@ -17,7 +17,7 @@ public class User
     public string PasswordHash { get; set; } = string.Empty;
 
     [Required, MaxLength(20)]
-    public string Role { get; set; } = "Student"; // "Admin" or "Student"
+    public string Role { get; set; } = "Student"; // "Admin", "Teacher", or "Student"
 
     public int? BranchId { get; set; }
     public Branch? Branch { get; set; }
@@ -38,4 +38,5 @@ public class User
 
     // Navigation
     public ICollection<TestResult> TestResults { get; set; } = new List<TestResult>();
+    public ICollection<TeacherDepartment> TeacherDepartments { get; set; } = new List<TeacherDepartment>();
 }

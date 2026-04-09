@@ -31,6 +31,9 @@ public class MockTest
     [MaxLength(500)]
     public string? PdfUrl { get; set; } // For PYQ PDFs
 
+    public int? CreatedByUserId { get; set; }
+    public User? CreatedBy { get; set; }
+
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
     // Navigation

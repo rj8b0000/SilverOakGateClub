@@ -118,4 +118,13 @@ public class NotesRepository : INotesRepository
             .Take(top)
             .ToListAsync();
     }
+
+    public async Task<List<Notes>> GetByUploaderAsync(int userId)
+    {
+        return await _context.Notes
+            .Where(n => n.UploadedByUserId == userId)
+            .Include(n => n.Branch)
+            .OrderByDescending(n => n.CreatedAt)
+            .ToListAsync();
+    }
 }

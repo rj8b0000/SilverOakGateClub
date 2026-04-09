@@ -35,4 +35,5 @@ public interface ITestRepository
     // Stats
     Task<int> GetTotalTestsCountAsync();
     Task<int> GetTotalQuestionsCountAsync();
+    Task<List<MockTest>> GetByCreatorAsync(int userId);
 }

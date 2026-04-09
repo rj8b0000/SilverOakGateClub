@@ -16,4 +16,5 @@ public interface INotesRepository
     Task<List<Notes>> GetBySubjectAsync(int branchId, string subject);
     Task<List<string>> GetSubjectsByBranchAsync(int branchId);
     Task<List<Notes>> GetTopRatedAsync(int branchId, int top = 10);
+    Task<List<Notes>> GetByUploaderAsync(int userId);
 }

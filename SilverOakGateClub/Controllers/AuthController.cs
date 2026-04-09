@@ -84,6 +84,10 @@ public class AuthController : Controller
         if (user.Role == "Admin")
             return RedirectToAction("Index", "Admin");
 
+        // Teacher goes to teacher dashboard
+        if (user.Role == "Teacher")
+            return RedirectToAction("Index", "Teacher");
+
         // Student selects branch if not set
         if (!string.IsNullOrEmpty(model.ReturnUrl) && Url.IsLocalUrl(model.ReturnUrl))
             return Redirect(model.ReturnUrl);

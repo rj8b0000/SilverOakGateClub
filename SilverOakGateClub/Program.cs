@@ -19,6 +19,7 @@ builder.Services.AddScoped<ILectureRepository, LectureRepository>();
 builder.Services.AddScoped<INotesRepository, NotesRepository>();
 builder.Services.AddScoped<IAnnouncementRepository, AnnouncementRepository>();
 builder.Services.AddScoped<IBranchRepository, BranchRepository>();
+builder.Services.AddScoped<ITeacherRepository, TeacherRepository>();
 
 // ── Cookie-based Authentication ──
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)

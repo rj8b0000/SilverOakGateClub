@@ -23,4 +23,5 @@ public class Branch
     public ICollection<MockTest> MockTests { get; set; } = new List<MockTest>();
     public ICollection<Lecture> Lectures { get; set; } = new List<Lecture>();
     public ICollection<Notes> Notes { get; set; } = new List<Notes>();
+    public ICollection<TeacherDepartment> TeacherDepartments { get; set; } = new List<TeacherDepartment>();
 }

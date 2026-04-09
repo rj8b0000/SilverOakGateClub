@@ -15,7 +15,7 @@
                 <h5><i class="bi bi-info-circle me-2" style="color:var(--primary);"></i>Test Details</h5>
             </div>
             <div class="card-body" style="padding:28px;">
-                <form asp-action="CreateTest" method="post" id="createTestForm">
+                <form asp-action="CreateTest" asp-controller="Admin" method="post" id="createTestForm" enctype="multipart/form-data">
                     @Html.AntiForgeryToken()
                     <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
 
@@ -56,15 +56,43 @@
                         </div>
                     </div>
 
-                    <!-- Questions -->
                     <hr style="border-color:var(--border-color);margin:24px 0;"/>
-                    <h5 style="font-weight:600;margin-bottom:16px;"><i class="bi bi-list-check me-2" style="color:var(--primary);"></i>Questions</h5>
 
-                    <div id="questionsContainer"></div>
+                    <!-- Entry Method -->
+                    <div class="mb-4">
+                        <label class="form-label d-block" style="font-weight:600;">Question Entry Method</label>
+                        <div class="btn-group w-100" role="group">
+                            <input type="radio" class="btn-check" name="entryMethod" id="methodManual" value="manual" checked>
+                            <label class="btn btn-outline-primary" for="methodManual"><i class="bi bi-pencil-square me-2"></i>Manual Entry</label>
 
-                    <button type="button" class="btn-outline-custom mt-3" onclick="addQuestion()">
-                        <i class="bi bi-plus-circle"></i> Add Question
-                    </button>
+                            <input type="radio" class="btn-check" name="entryMethod" id="methodExcel" value="excel">
+                            <label class="btn btn-outline-success" for="methodExcel"><i class="bi bi-file-earmark-excel me-2"></i>Excel Upload</label>
+                        </div>
+                    </div>
+
+                    <!-- Excel Upload Section -->
+                    <div id="excelSection" style="display:none;" class="animate-in">
+                        <div class="alert alert-info-soft d-flex align-items-center mb-3">
+                            <i class="bi bi-info-circle-fill me-3 fs-4"></i>
+                            <div>
+                                <strong>Tip:</strong> Download the <a href="@Url.Action("DownloadExcelTemplate", "Admin")" class="alert-link">Excel Template</a>, fill in your questions, and upload it here.
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label asp-for="ExcelFile" class="form-label">Upload Excel File (.xlsx)</label>
+                            <input asp-for="ExcelFile" type="file" class="form-control" accept=".xlsx" />
+                            <p class="form-text mt-1" style="font-size:0.8rem;color:var(--text-muted);">Ensure row 1 contains headers. Parsing starts from row 2.</p>
+                        </div>
+                    </div>
+
+                    <!-- Manual Entry Section -->
+                    <div id="manualSection" class="animate-in">
+                        <h5 style="font-weight:600;margin-bottom:16px;"><i class="bi bi-list-check me-2" style="color:var(--primary);"></i>Questions</h5>
+                        <div id="questionsContainer"></div>
+                        <button type="button" class="btn-outline-custom mt-3" onclick="addQuestion()">
+                            <i class="bi bi-plus-circle"></i> Add Question
+                        </button>
+                    </div>
 
                     <hr style="border-color:var(--border-color);margin:24px 0;"/>
 
@@ -86,6 +114,35 @@
 
         document.getElementById('IsPYQ')?.addEventListener('change', function () {
             document.getElementById('yearField').style.display = this.checked ? 'block' : 'none';
+        });
+
+        // Toggle between Manual and Excel
+        function updateEntryMethod() {
+            const selectedMethod = document.querySelector('input[name="entryMethod"]:checked').value;
+            const isExcel = selectedMethod === 'excel';
+            document.getElementById('excelSection').style.display = isExcel ? 'block' : 'none';
+            document.getElementById('manualSection').style.display = isExcel ? 'none' : 'block';
+            
+            // Disable hidden fields so they don't block validation
+            document.querySelectorAll('#excelSection input, #excelSection select, #excelSection textarea').forEach(el => {
+                el.disabled = !isExcel;
+            });
+            document.querySelectorAll('#manualSection input, #manualSection select, #manualSection textarea').forEach(el => {
+                el.disabled = isExcel;
+            });
+        }
+
+        document.querySelectorAll('input[name="entryMethod"]').forEach(radio => {
+            radio.addEventListener('change', updateEntryMethod);
+        });
+
+        // Initialize state on load
+        updateEntryMethod();
+
+        document.getElementById('createTestForm').addEventListener('submit', function(e) {
+            console.log('Form submission triggered!');
+            const method = document.querySelector('input[name="entryMethod"]:checked').value;
+            console.log('Entry Method:', method);
         });
 
         function addQuestion() {

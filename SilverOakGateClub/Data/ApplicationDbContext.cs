@@ -18,6 +18,7 @@ public class ApplicationDbContext : DbContext
     public DbSet<Lecture> Lectures => Set<Lecture>();
     public DbSet<Notes> Notes => Set<Notes>();
     public DbSet<Announcement> Announcements => Set<Announcement>();
+    public DbSet<TeacherDepartment> TeacherDepartments => Set<TeacherDepartment>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -33,12 +34,33 @@ public class ApplicationDbContext : DbContext
                   .OnDelete(DeleteBehavior.SetNull);
         });
 
+        // TeacherDepartment (many-to-many join)
+        modelBuilder.Entity<TeacherDepartment>(entity =>
+        {
+            entity.HasKey(td => new { td.TeacherId, td.DepartmentId });
+
+            entity.HasOne(td => td.Teacher)
+                  .WithMany(u => u.TeacherDepartments)
+                  .HasForeignKey(td => td.TeacherId)
+                  .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasOne(td => td.Department)
+                  .WithMany(b => b.TeacherDepartments)
+                  .HasForeignKey(td => td.DepartmentId)
+                  .OnDelete(DeleteBehavior.Cascade);
+        });
+
         // MockTest
         modelBuilder.Entity<MockTest>(entity =>
         {
             entity.HasOne(m => m.Branch)
                   .WithMany(b => b.MockTests)
                   .HasForeignKey(m => m.BranchId)
+                  .OnDelete(DeleteBehavior.SetNull);
+
+            entity.HasOne(m => m.CreatedBy)
+                  .WithMany()
+                  .HasForeignKey(m => m.CreatedByUserId)
                   .OnDelete(DeleteBehavior.SetNull);
         });
 
@@ -71,6 +93,11 @@ public class ApplicationDbContext : DbContext
             entity.HasOne(l => l.Branch)
                   .WithMany(b => b.Lectures)
                   .HasForeignKey(l => l.BranchId)
+                  .OnDelete(DeleteBehavior.SetNull);
+
+            entity.HasOne(l => l.CreatedBy)
+                  .WithMany()
+                  .HasForeignKey(l => l.CreatedByUserId)
                   .OnDelete(DeleteBehavior.SetNull);
         });
 
@@ -113,3 +140,4 @@ public class ApplicationDbContext : DbContext
         );
     }
 }
+

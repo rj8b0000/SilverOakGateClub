@@ -42,11 +42,14 @@
                         <td>@n.DownloadCount</td>
                         <td style="color:var(--text-muted);">@n.UploadedBy?.FullName</td>
                         <td>
-                            <form asp-action="DeleteNotes" asp-route-id="@n.Id" method="post" style="display:inline;"
-                                  onsubmit="return confirm('Delete these notes?');">
-                                @Html.AntiForgeryToken()
-                                <button type="submit" class="btn-danger-soft"><i class="bi bi-trash3"></i></button>
-                            </form>
+                            <div class="action-btns">
+                                <a href="@Url.Action("EditNotes", "Admin", new { id = n.Id })" class="btn-info-soft btn-sm"><i class="bi bi-pencil"></i></a>
+                                <form asp-action="DeleteNotes" asp-route-id="@n.Id" method="post" style="display:inline;"
+                                      onsubmit="return confirm('Delete these notes?');">
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit" class="btn-danger-soft btn-sm"><i class="bi bi-trash3"></i></button>
+                                </form>
+                            </div>
                         </td>
                     </tr>
                 }

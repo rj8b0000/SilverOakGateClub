@@ -44,11 +44,16 @@
                         <td><span class="@(t.IsActive ? "badge-success" : "badge-warning")">@(t.IsActive ? "Active" : "Inactive")</span></td>
                         <td style="font-size:0.85rem;color:var(--text-muted);">@t.CreatedAt.ToString("dd MMM yyyy")</td>
                         <td>
-                            <form asp-action="DeleteTest" asp-route-id="@t.Id" method="post" style="display:inline;"
-                                  onsubmit="return confirm('Delete this test and all its questions?');">
-                                @Html.AntiForgeryToken()
-                                <button type="submit" class="btn-danger-soft"><i class="bi bi-trash3"></i></button>
-                            </form>
+                            <div class="action-btns">
+                                <a href="@Url.Action("ViewTest", "Admin", new { id = t.Id })" class="btn-info-soft btn-sm"><i class="bi bi-eye"></i></a>
+                                <a href="@Url.Action("EditTest", "Admin", new { id = t.Id })" class="btn-warning-soft btn-sm" style="background:rgba(237,108,2,0.08);color:var(--warning);border:1px solid rgba(237,108,2,0.2);"><i class="bi bi-pencil"></i></a>
+                                <a href="@Url.Action("UploadQuestionsExcel", "Admin", new { id = t.Id })" class="btn-success-soft btn-sm"><i class="bi bi-file-earmark-excel"></i></a>
+                                <form asp-action="DeleteTest" asp-route-id="@t.Id" method="post" style="display:inline;"
+                                      onsubmit="return confirm('Delete this test and all its questions?');">
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit" class="btn-danger-soft btn-sm"><i class="bi bi-trash3"></i></button>
+                                </form>
+                            </div>
                         </td>
                     </tr>
                 }

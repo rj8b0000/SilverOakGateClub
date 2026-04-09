@@ -14,4 +14,5 @@ public interface ILectureRepository
     Task<int> GetTotalCountAsync();
     Task<List<Lecture>> GetBySubjectAsync(int branchId, string subject);
     Task<List<string>> GetSubjectsByBranchAsync(int branchId);
+    Task<List<Lecture>> GetByCreatorAsync(int userId);
 }

@@ -1,0 +1,128 @@
+@model SilverOakGateClub.ViewModel.TeacherContentViewModel
+@{ ViewData["Title"] = "My Content"; }
+
+<div class="page-header d-flex justify-content-between align-items-start">
+    <div>
+        <h1>My Content</h1>
+        <p>View and manage all your uploaded content</p>
+    </div>
+</div>
+
+<!-- Notes -->
+<div class="card mb-4">
+    <div class="card-header">
+        <h5><i class="bi bi-file-earmark-text me-2"></i>My Notes (@Model.Notes.Count)</h5>
+        <a href="@Url.Action("CreateNotes", "Teacher")" class="btn-primary-gradient btn-sm"><i class="bi bi-plus"></i> Upload</a>
+    </div>
+    <div class="card-body p-0">
+        @if (Model.Notes.Count == 0)
+        {
+            <div class="empty-state"><i class="bi bi-file-earmark-text"></i><p>No notes uploaded yet</p></div>
+        }
+        else
+        {
+            <div class="table-responsive">
+                <table class="table-modern">
+                    <thead><tr><th>Title</th><th>Department</th><th>Subject</th><th>Downloads</th><th>Date</th><th>Actions</th></tr></thead>
+                    <tbody>
+                    @foreach (var n in Model.Notes)
+                    {
+                        <tr>
+                            <td><strong>@n.Title</strong></td>
+                            <td><span class="badge-primary">@(n.Branch?.Name ?? "All")</span></td>
+                            <td>@(n.Subject ?? "—")</td>
+                            <td>@n.DownloadCount</td>
+                            <td>@n.CreatedAt.ToString("dd MMM yyyy")</td>
+                            <td>
+                                <div class="action-btns">
+                                    <a href="@Url.Action("EditNotes", "Teacher", new { id = n.Id })" class="btn-info-soft btn-sm"><i class="bi bi-pencil"></i> Edit</a>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                    </tbody>
+                </table>
+            </div>
+        }
+    </div>
+</div>
+
+<!-- Lectures -->
+<div class="card mb-4">
+    <div class="card-header">
+        <h5><i class="bi bi-play-circle me-2"></i>My Lectures (@Model.Lectures.Count)</h5>
+        <a href="@Url.Action("CreateLecture", "Teacher")" class="btn-primary-gradient btn-sm"><i class="bi bi-plus"></i> Add</a>
+    </div>
+    <div class="card-body p-0">
+        @if (Model.Lectures.Count == 0)
+        {
+            <div class="empty-state"><i class="bi bi-play-circle"></i><p>No lectures created yet</p></div>
+        }
+        else
+        {
+            <div class="table-responsive">
+                <table class="table-modern">
+                    <thead><tr><th>Title</th><th>Department</th><th>Subject</th><th>Duration</th><th>Views</th><th>Actions</th></tr></thead>
+                    <tbody>
+                    @foreach (var l in Model.Lectures)
+                    {
+                        <tr>
+                            <td><strong>@l.Title</strong></td>
+                            <td><span class="badge-primary">@(l.Branch?.Name ?? "All")</span></td>
+                            <td>@(l.Subject ?? "—")</td>
+                            <td>@l.DurationMinutes min</td>
+                            <td>@l.ViewCount</td>
+                            <td>
+                                <div class="action-btns">
+                                    <a href="@Url.Action("EditLecture", "Teacher", new { id = l.Id })" class="btn-info-soft btn-sm"><i class="bi bi-pencil"></i> Edit</a>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                    </tbody>
+                </table>
+            </div>
+        }
+    </div>
+</div>
+
+<!-- Tests -->
+<div class="card">
+    <div class="card-header">
+        <h5><i class="bi bi-journal-check me-2"></i>My Tests (@Model.Tests.Count)</h5>
+        <a href="@Url.Action("CreateTest", "Teacher")" class="btn-primary-gradient btn-sm"><i class="bi bi-plus"></i> Create</a>
+    </div>
+    <div class="card-body p-0">
+        @if (Model.Tests.Count == 0)
+        {
+            <div class="empty-state"><i class="bi bi-journal-check"></i><p>No tests created yet</p></div>
+        }
+        else
+        {
+            <div class="table-responsive">
+                <table class="table-modern">
+                    <thead><tr><th>Title</th><th>Department</th><th>Questions</th><th>Duration</th><th>Status</th><th>Actions</th></tr></thead>
+                    <tbody>
+                    @foreach (var t in Model.Tests)
+                    {
+                        <tr>
+                            <td><strong>@t.Title</strong></td>
+                            <td><span class="badge-primary">@(t.Branch?.Name ?? "All")</span></td>
+                            <td>@t.Questions.Count</td>
+                            <td>@t.DurationMinutes min</td>
+                            <td>
+                                @if (t.IsActive) { <span class="badge-success">Active</span> } else { <span class="badge-danger">Inactive</span> }
+                            </td>
+                            <td>
+                                <div class="action-btns">
+                                    <a href="@Url.Action("EditTest", "Teacher", new { id = t.Id })" class="btn-info-soft btn-sm"><i class="bi bi-pencil"></i> Edit</a>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                    </tbody>
+                </table>
+            </div>
+        }
+    </div>
+</div>

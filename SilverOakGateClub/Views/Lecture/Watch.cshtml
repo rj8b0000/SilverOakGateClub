@@ -3,79 +3,95 @@
     ViewData["Title"] = Model.Title;
 }
 
-<div class="mb-4">
-    <a href="@Url.Action("Index", "Lecture")" class="btn-outline-custom btn-sm mb-3">
+<div class="mb-4 d-flex align-items-center gap-3">
+    <a href="@Url.Action("Index", "Lecture")" class="btn-outline-custom btn-sm">
         <i class="bi bi-arrow-left"></i> Back to Lectures
     </a>
+    <h5 class="mb-0 text-muted" style="font-weight:500;">/ @Model.Subject / @Model.Title</h5>
 </div>
 
-<div class="row g-4">
-    <div class="col-xl-8">
+<div class="watch-container mb-5">
+    <div class="video-wrapper">
         @{
             var isYouTube = Model.VideoUrl.Contains("youtube") || Model.VideoUrl.Contains("youtu.be");
             var videoId = Model.VideoUrl;
-            if (videoId.Contains("v=")) videoId = videoId.Split("v=")[1].Split("&")[0];
-            else if (videoId.Contains("youtu.be/")) videoId = videoId.Split("youtu.be/")[1].Split("?")[0];
+            if (isYouTube)
+            {
+                if (videoId.Contains("v=")) videoId = videoId.Split("v=")[1].Split("&")[0];
+                else if (videoId.Contains("youtu.be/")) videoId = videoId.Split("youtu.be/")[1].Split("?")[0];
+            }
         }
-        <div class="video-container mb-4">
+        <div class="video-player">
             @if (isYouTube)
             {
-                <iframe src="https://www.youtube.com/embed/@videoId" allowfullscreen></iframe>
+                <iframe src="https://www.youtube.com/embed/@videoId?autoplay=0&rel=0&modestbranding=1" 
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                        allowfullscreen></iframe>
             }
             else
             {
-                <video controls>
-                    <source src="@Model.VideoUrl"/>
+                <video controls crossorigin="anonymous">
+                    <source src="@Model.VideoUrl" type="video/mp4"/>
                     Your browser does not support the video tag.
                 </video>
             }
         </div>
+    </div>
+</div>
 
-        <div class="card">
-            <div class="card-body">
-                <h4 style="font-weight:700;margin-bottom:8px;">@Model.Title</h4>
-                <div class="d-flex gap-3 mb-3 flex-wrap" style="font-size:0.85rem;color:var(--text-muted);">
-                    @if (!string.IsNullOrEmpty(Model.Subject))
-                    {
-                        <span class="badge-primary">@Model.Subject</span>
-                    }
-                    <span><i class="bi bi-clock me-1"></i>@Model.DurationMinutes min</span>
-                    <span><i class="bi bi-eye me-1"></i>@Model.ViewCount views</span>
-                    <span><i class="bi bi-calendar me-1"></i>@Model.CreatedAt.ToString("dd MMM yyyy")</span>
+<div class="container-fluid px-0">
+    <div class="row g-4">
+        <div class="col-xl-8">
+            <div class="mb-4">
+                <h1 class="display-6 fw-bold mb-3">@Model.Title</h1>
+                <div class="d-flex align-items-center gap-4 flex-wrap text-muted small">
+                    <span class="badge-primary">@Model.Subject</span>
+                    <span><i class="bi bi-eye me-1"></i> @Model.ViewCount views</span>
+                    <span><i class="bi bi-calendar3 me-1"></i> Published on @Model.CreatedAt.ToString("MMM dd, yyyy")</span>
+                    <span><i class="bi bi-clock me-1"></i> Duration: @Model.DurationMinutes min</span>
                 </div>
+            </div>
 
-                @if (!string.IsNullOrEmpty(Model.Description))
-                {
-                    <p style="color:var(--text-secondary);line-height:1.7;">@Model.Description</p>
-                }
+            <div class="card border-0 shadow-sm" style="background:var(--bg-secondary); border-radius:12px;">
+                <div class="card-body p-4">
+                    <h5 class="fw-bold mb-3">About this lecture</h5>
+                    <p class="mb-0" style="color:var(--text-secondary); line-height:1.8; white-space: pre-wrap;">@Model.Description</p>
+                </div>
             </div>
         </div>
-    </div>
 
-    <div class="col-xl-4">
-        <div class="card">
-            <div class="card-header">
-                <h5><i class="bi bi-info-circle me-2" style="color:var(--primary);"></i>Lecture Info</h5>
-            </div>
-            <div class="card-body">
-                <div class="mb-3">
-                    <div style="font-size:0.8rem;color:var(--text-muted);margin-bottom:4px;">Branch</div>
-                    <div style="font-weight:600;">@Model.Branch?.Name</div>
+        <div class="col-xl-4">
+            <div class="lecture-sidebar-card shadow-sm p-4">
+                <h5 class="fw-bold mb-4 border-bottom pb-3"><i class="bi bi-info-circle me-2 text-primary"></i>Lecture Details</h5>
+                
+                <div class="info-row">
+                    <div class="info-label">Department</div>
+                    <div class="info-value">@Model.Branch?.Name</div>
                 </div>
+                
                 @if (!string.IsNullOrEmpty(Model.Subject))
                 {
-                    <div class="mb-3">
-                        <div style="font-size:0.8rem;color:var(--text-muted);margin-bottom:4px;">Subject</div>
-                        <div style="font-weight:600;">@Model.Subject</div>
+                    <div class="info-row">
+                        <div class="info-label">Subject</div>
+                        <div class="info-value">@Model.Subject</div>
                     </div>
                 }
-                <div class="mb-3">
-                    <div style="font-size:0.8rem;color:var(--text-muted);margin-bottom:4px;">Duration</div>
-                    <div style="font-weight:600;">@Model.DurationMinutes minutes</div>
+
+                <div class="info-row">
+                    <div class="info-label">Video Source</div>
+                    <div class="info-value text-primary">@(isYouTube ? "YouTube" : "Server Storage")</div>
                 </div>
-                <div>
-                    <div style="font-size:0.8rem;color:var(--text-muted);margin-bottom:4px;">Total Views</div>
-                    <div style="font-weight:600;">@Model.ViewCount</div>
+
+                <div class="mt-4">
+                    <div class="p-3 bg-light rounded-3 d-flex align-items-center gap-3">
+                        <div class="user-avatar" style="width:48px; height:48px;">
+                            <i class="bi bi-person-badge fs-4"></i>
+                        </div>
+                        <div>
+                            <div class="small text-muted">Uploaded By</div>
+                            <div class="fw-bold">Instructor</div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

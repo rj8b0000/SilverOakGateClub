@@ -93,4 +93,13 @@ public class LectureRepository : ILectureRepository
             .OrderBy(s => s)
             .ToListAsync();
     }
+
+    public async Task<List<Lecture>> GetByCreatorAsync(int userId)
+    {
+        return await _context.Lectures
+            .Where(l => l.CreatedByUserId == userId)
+            .Include(l => l.Branch)
+            .OrderByDescending(l => l.CreatedAt)
+            .ToListAsync();
+    }
 }

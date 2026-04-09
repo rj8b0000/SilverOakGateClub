@@ -33,5 +33,8 @@ public class Lecture
 
     public int ViewCount { get; set; } = 0;
 
+    public int? CreatedByUserId { get; set; }
+    public User? CreatedBy { get; set; }
+
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 }

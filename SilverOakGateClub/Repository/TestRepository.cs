@@ -188,4 +188,14 @@ public class TestRepository : ITestRepository
     {
         return await _context.Questions.CountAsync();
     }
+
+    public async Task<List<MockTest>> GetByCreatorAsync(int userId)
+    {
+        return await _context.MockTests
+            .Where(t => t.CreatedByUserId == userId)
+            .Include(t => t.Branch)
+            .Include(t => t.Questions)
+            .OrderByDescending(t => t.CreatedAt)
+            .ToListAsync();
+    }
 }

@@ -1,0 +1,72 @@
+@model SilverOakGateClub.ViewModel.EditNotesViewModel
+@{ ViewData["Title"] = "Edit Notes"; }
+
+<div class="page-header">
+    <h1>Edit Notes</h1>
+    <p>Update study material details or replace the file</p>
+</div>
+
+<div class="card" style="max-width:800px;">
+    <div class="card-header">
+        <h5><i class="bi bi-file-earmark-text me-2" style="color:var(--primary);"></i>Notes Information</h5>
+    </div>
+    <div class="card-body" style="padding:28px;">
+        <form asp-action="EditNotes" asp-controller="Teacher" method="post" enctype="multipart/form-data">
+            @Html.AntiForgeryToken()
+            <input type="hidden" asp-for="Id" />
+            <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+            <div class="mb-4">
+                <label asp-for="Title" class="form-label">Notes Title *</label>
+                <input asp-for="Title" class="form-control" placeholder="e.g., Engineering Mathematics - Part 1" />
+                <span asp-validation-for="Title" class="text-danger"></span>
+            </div>
+
+            <div class="mb-4">
+                <label asp-for="Description" class="form-label">Description</label>
+                <textarea asp-for="Description" class="form-control" rows="3" placeholder="Briefly describe the contents of these notes"></textarea>
+            </div>
+
+            <div class="row g-3 mb-4">
+                <div class="col-md-6">
+                    <label asp-for="BranchId" class="form-label">Department</label>
+                    <select asp-for="BranchId" class="form-select">
+                        <option value="">— All My Departments —</option>
+                        @foreach (var b in Model.Branches)
+                        {
+                            <option value="@b.Id">@b.Name</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-md-6">
+                    <label asp-for="Subject" class="form-label">Subject</label>
+                    <input asp-for="Subject" class="form-control" placeholder="e.g., Mathematics" />
+                </div>
+            </div>
+
+            <div class="mb-4">
+                <label asp-for="File" class="form-label">Replace File (Optional)</label>
+                <input asp-for="File" type="file" class="form-control" accept=".pdf,.doc,.docx,.ppt,.pptx" />
+                <p class="form-text mt-1" style="font-size:0.8rem;color:var(--text-muted);">
+                    Leave empty to keep current file. Allowed: PDF, DOC, DOCX, PPT, PPTX (Max 50MB)
+                </p>
+            </div>
+
+            <div class="mb-4 d-flex gap-4">
+                <div class="form-check">
+                    <input asp-for="IsActive" class="form-check-input" />
+                    <label asp-for="IsActive" class="form-check-label">Available for Students</label>
+                </div>
+            </div>
+
+            <hr style="border-color:var(--border-color);margin:24px 0;" />
+
+            <div class="d-flex gap-3">
+                <button type="submit" class="btn-primary-gradient px-4">
+                    <i class="bi bi-check2-circle"></i> Save Changes
+                </button>
+                <a href="@Url.Action("MyContent", "Teacher")" class="btn-outline-custom">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>

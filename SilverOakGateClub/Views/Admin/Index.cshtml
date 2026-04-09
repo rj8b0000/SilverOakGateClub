@@ -18,6 +18,15 @@
         </div>
     </div>
     <div class="col-md-6 col-xl-2 animate-in">
+        <a href="@Url.Action("Teachers", "Admin")" style="text-decoration:none; color:inherit;">
+            <div class="stat-card">
+                <div class="stat-icon cyan"><i class="bi bi-person-badge-fill"></i></div>
+                <div class="stat-value">@Model.TotalTeachers</div>
+                <div class="stat-label">Teachers</div>
+            </div>
+        </a>
+    </div>
+    <div class="col-md-6 col-xl-2 animate-in">
         <div class="stat-card">
             <div class="stat-icon blue"><i class="bi bi-journal-check"></i></div>
             <div class="stat-value">@Model.TotalTests</div>
